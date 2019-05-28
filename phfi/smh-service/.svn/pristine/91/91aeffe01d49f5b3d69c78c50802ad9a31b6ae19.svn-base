@@ -1,0 +1,11 @@
+package com.chatak.beacon.dao;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.UserRoleEntityMap;
+
+public interface UserRoleEntityMapDao {
+	
+	 public UserRoleEntityMap findByUserRoleId(Long userRoleId) throws DataAccessException,Exception;
+
+}

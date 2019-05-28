@@ -1,0 +1,28 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.FloorPlanResponse;
+import com.chatak.beacon.model.FloorPlanRequest;
+import com.chatak.beacon.model.Response;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 24-Nov-2015 11:45:23 AM
+ * @version 1.0
+ */
+public interface FloorPlanHandler {
+	
+	public Response floorPlanCreate(FloorPlanRequest floorPlanRequest);
+	
+	public Response floorPlanUpdate(FloorPlanRequest floorPlanRequest);
+	
+	public FloorPlanResponse searchFloorPlans(FloorPlanRequest floorPlanRequest);
+	
+	public FloorPlanResponse findFloorPlanDetails(FloorPlanRequest floorPlanRequest);
+	
+	public Response deleteFloorPlan(Long floorPlanId);
+	
+	public Response changeStatus(FloorPlanRequest floorPlanRequest);
+
+}

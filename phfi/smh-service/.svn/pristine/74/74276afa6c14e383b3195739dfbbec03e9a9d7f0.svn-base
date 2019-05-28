@@ -1,0 +1,96 @@
+package com.chatak.beacon.rest.service.impl;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import com.chatak.beacon.handler.FloorPlanHandler;
+import com.chatak.beacon.model.FloorPlanRequest;
+import com.chatak.beacon.model.FloorPlanResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.rest.service.RestFloorPlanService;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 24-Nov-2015 11:45:23 AM
+ * @version 1.0
+ */
+@RestController
+@RequestMapping(value = "/floorPlanService", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestFloorPlanServiceImpl implements RestFloorPlanService {
+
+	private static Logger logger = Logger.getLogger(RestFloorPlanServiceImpl.class);
+
+	@Autowired
+	FloorPlanHandler floorHandler;
+
+	@RequestMapping(value = "/floorPlanCreate", method = RequestMethod.POST)
+	public Response floorPlanCreate(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: RestController :: RestFloorPlanServiceImpl :: floorPlanCreate method");
+		Response beaconResponse = floorHandler.floorPlanCreate(floorPlanRequest);
+		logger.info("Exiting :: RestController :: RestFloorPlanServiceImpl :: floorPlanCreate method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/floorPlanUpdate", method = RequestMethod.POST)
+	public Response floorPlanUpdate(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: RestController :: RestFloorPlanServiceImpl :: floorPlanUpdate method");
+		Response beaconResponse = floorHandler.floorPlanUpdate(floorPlanRequest);
+		logger.info("Exiting :: RestController :: RestFloorPlanServiceImpl :: floorPlanUpdate method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/searchFloorPlans", method = RequestMethod.POST)
+	public FloorPlanResponse searchFloorPlans(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: RestController :: RestFloorPlanServiceImpl :: searchFloorPlans method");
+		FloorPlanResponse beaconResponse = floorHandler.searchFloorPlans(floorPlanRequest);
+		logger.info("Exiting :: RestController :: RestFloorPlanServiceImpl :: searchFloorPlans method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/findFloorPlanDetails", method = RequestMethod.POST)
+	public Response findFloorPlanDetails(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: RestController :: RestFloorPlanServiceImpl :: findFloorPlanDetails method");
+		Response floorPlanResponse = floorHandler.findFloorPlanDetails(floorPlanRequest);
+		logger.info("Exiting :: RestController :: RestFloorPlanServiceImpl :: findFloorPlanDetails method");
+		return floorPlanResponse;
+	}
+
+	@RequestMapping(value = "/deleteFloorPlan", method = RequestMethod.POST)
+	public Response deleteFloorPlan(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: RestController :: RestFloorPlanServiceImpl :: deleteFloorPlan method");
+		Response beaconResponse = floorHandler.deleteFloorPlan(floorPlanRequest.getId());
+		logger.info("Exiting :: RestController :: RestFloorPlanServiceImpl :: deleteFloorPlan method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/changeFloorPlanStatus", method = RequestMethod.POST)
+	public Response changeStatus(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: RestController :: RestFloorPlanServiceImpl :: changeStatus method");
+		Response beaconResponse = floorHandler.changeStatus(floorPlanRequest);
+		logger.info("Exiting :: RestController :: RestFloorPlanServiceImpl :: changeStatus method");
+		return beaconResponse;
+	}
+
+}

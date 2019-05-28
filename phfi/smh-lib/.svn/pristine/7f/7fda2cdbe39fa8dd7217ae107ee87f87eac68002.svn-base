@@ -1,0 +1,639 @@
+package com.chatak.beacon.constants;
+
+import java.util.HashMap;
+
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class ErrorCode {
+
+  private static HashMap mMessages;
+
+  private static ErrorCode mInstance = null;
+
+
+  public static final String ERROR_CODE_00 = "00";
+
+  public static final String ERROR_CODE_01 = "01";
+
+  public static final String ERROR_CODE_02 = "02";
+
+  public static final String ERROR_CODE_03 = "03";
+
+  public static final String ERROR_CODE_04 = "04";
+
+  public static final String ERROR_CODE_05 = "05";
+
+  public static final String ERROR_CODE_06 = "06";
+
+  public static final String ERROR_CODE_07 = "07";
+
+  public static final String ERROR_CODE_08 = "08";
+
+  public static final String ERROR_CODE_09 = "09";
+
+  public static final String ERROR_CODE_10 = "10";
+
+  public static final String ERROR_CODE_11 = "11";
+
+  public static final String ERROR_CODE_12 = "12";
+
+  public static final String ERROR_CODE_13 = "13";
+
+  public static final String ERROR_CODE_14 = "14";
+
+  public static final String ERROR_CODE_15 = "15";
+
+  public static final String ERROR_CODE_16 = "16";
+
+  public static final String ERROR_CODE_17 = "17";
+
+  public static final String ERROR_CODE_18 = "18";
+
+  public static final String ERROR_CODE_19 = "19";
+
+  public static final String ERROR_CODE_20 = "20";
+
+  public static final String ERROR_CODE_21 = "21";
+
+  public static final String ERROR_CODE_22 = "22";
+
+  public static final String ERROR_CODE_23 = "23";
+
+  public static final String ERROR_CODE_24 = "24";
+
+  public static final String ERROR_CODE_25 = "25";
+
+  public static final String ERROR_CODE_26 = "26";
+
+  public static final String ERROR_CODE_27 = "27";
+
+  public static final String ERROR_CODE_28 = "28";
+
+  public static final String ERROR_CODE_29 = "29";
+
+  public static final String ERROR_CODE_30 = "30";
+
+  public static final String ERROR_CODE_31 = "31";
+
+  public static final String ERROR_CODE_32 = "32";
+
+  public static final String ERROR_CODE_33 = "33";
+
+  public static final String ERROR_CODE_34 = "34";
+
+  public static final String ERROR_CODE_35 = "35";
+
+  public static final String ERROR_CODE_36 = "36";
+
+  public static final String ERROR_CODE_37 = "37";
+
+  public static final String ERROR_CODE_38 = "38";
+
+  public static final String ERROR_CODE_39 = "39";
+
+  public static final String ERROR_CODE_40 = "40";
+
+  public static final String ERROR_CODE_41 = "41";
+
+  public static final String ERROR_CODE_42 = "42";
+
+  public static final String ERROR_CODE_43 = "43";
+
+  public static final String ERROR_CODE_44 = "44";
+
+  public static final String ERROR_CODE_45 = "45";
+
+  public static final String ERROR_CODE_46 = "46";
+
+  public static final String ERROR_CODE_47 = "47";
+
+  public static final String ERROR_CODE_48 = "48";
+
+  public static final String ERROR_CODE_49 = "49";
+
+  public static final String ERROR_CODE_50 = "50";
+
+  public static final String ERROR_CODE_51 = "51";
+
+  public static final String ERROR_CODE_52 = "52";
+
+  public static final String ERROR_CODE_53 = "53";
+
+  public static final String ERROR_CODE_54 = "54";
+
+  public static final String ERROR_CODE_55 = "55";
+
+  public static final String ERROR_CODE_56 = "56";
+
+  public static final String ERROR_CODE_57 = "57";
+
+  public static final String ERROR_CODE_58 = "58";
+
+  public static final String ERROR_CODE_59 = "59";
+
+  public static final String ERROR_CODE_60 = "60";
+
+  public static final String ERROR_CODE_61 = "61";
+
+  public static final String ERROR_CODE_62 = "62";
+
+  public static final String ERROR_CODE_63 = "63";
+
+  public static final String ERROR_CODE_65 = "65";
+
+  public static final String ERROR_CODE_98 = "98";
+
+  public static final String ERROR_CODE_99 = "99";
+
+  public static final String ERROR_CODE_64 = "64";
+
+  public static final String ERROR_CODE_66 = "66";
+
+  public static final String ERROR_CODE_67 = "67";
+
+  public static final String ERROR_CODE_68 = "68";
+
+  public static final String ERROR_CODE_69 = "69";
+
+  public static final String ERROR_CODE_70 = "70";
+
+  public static final String ERROR_CODE_71 = "71";
+
+  public static final String ERROR_CODE_72 = "72";
+
+  public static final String ERROR_CODE_73 = "73";
+
+  public static final String ERROR_CODE_74 = "74";
+
+  public static final String ERROR_CODE_75 = "75";
+
+  public static final String ERROR_CODE_76 = "76";
+
+  public static final String ERROR_CODE_77 = "77";
+
+  public static final String ERROR_CODE_78 = "78";
+
+  public static final String ERROR_CODE_79 = "79";
+
+  public static final String ERROR_CODE_80 = "80";
+
+  public static final String ERROR_CODE_81 = "81";
+
+  public static final String ERROR_CODE_82 = "82";
+
+  public static final String ERROR_CODE_83 = "83";
+
+  public static final String ERROR_CODE_84 = "84";
+
+  public static final String ERROR_CODE_85 = "85";
+
+  public static final String ERROR_CODE_86 = "86";
+
+  public static final String ERROR_CODE_87 = "87";
+
+  public static final String ERROR_CODE_88 = "88";
+
+  public static final String ERROR_CODE_89 = "89";
+  
+  public static final String ERROR_CODE_90 = "90";
+  
+  public static final String ERROR_CODE_91 = "91";
+
+  public static final String ERROR_CODE_92 = "92";
+  
+  public static final String ERROR_CODE_93 = "93";
+  
+  public static final String ERROR_CODE_94 = "94";
+
+  public static final String ERROR_CODE_95 = "95";
+  
+  public static final String ERROR_CODE_96 = "96";
+  
+  public static final String ERROR_CODE_97 = "97";
+  
+  public static final String ERROR_CODE_100 = "100";
+
+  public static final String ERROR_CODE_101 = "101";
+  
+  public static final String ERROR_CODE_102 = "102";
+  
+  public static final String ERROR_CODE_103 = "103";
+  
+  public static final String ERROR_CODE_104 = "104";
+  
+  public static final String ERROR_CODE_105 = "105";
+
+  public static final String ERROR_CODE_106 = "106";
+
+  public static final String ERROR_CODE_107 = "107";
+
+  public static final String ERROR_CODE_108 = "108";
+  
+  public static final String ERROR_CODE_109 = "109";
+  
+  public static final String ERROR_CODE_110 = "110";
+
+  public static final String ERROR_CODE_111 = "111";
+  
+  public static final String ERROR_CODE_112 = "112";
+ 
+  public static final String ERROR_CODE_113 = "113";
+  
+  public static final String ERROR_CODE_114 = "114";
+
+  public static final String ERROR_CODE_115 = "115";
+  
+  public static final String ERROR_CODE_116 = "116";
+  
+  public static final String ERROR_CODE_117 = "117";
+  
+  public static final String ERROR_CODE_118 = "118";
+  
+  public static final String ERROR_CODE_119 = "119";
+  
+  public static final String ERROR_CODE_120 = "120";
+  
+  public static final String ERROR_CODE_121 = "121";
+  
+  public static final String ERROR_CODE_122 = "122";
+  
+  public static final String ERROR_CODE_123 = "123";
+  
+  public static final String ERROR_CODE_124 = "124";
+  
+  public static final String ERROR_CODE_125 = "125";
+  
+  public static final String ERROR_CODE_126 = "126";
+  
+  public static final String ERROR_CODE_127 = "127";
+  
+  public static final String ERROR_CODE_128 = "128";
+  
+  public static final String ERROR_CODE_129 = "129";
+  
+  public static final String ERROR_CODE_131 = "131";
+  
+  public static final String ERROR_CODE_133 = "133";
+  
+  public static final String ERROR_CODE_134 = "134";
+  
+  public static final String ERROR_CODE_135 = "135";
+
+  public static final String ERROR_CODE_136 = "136";
+  
+  public static final String ERROR_CODE_137 = "137";
+  
+  public static final String ERROR_CODE_138 = "138";
+  
+  public static final String ERROR_CODE_139 = "139";
+  
+  public static final String ERROR_CODE_140 = "140";
+  
+  public static final String ERROR_CODE_141 = "141";
+  
+  public static final String ERROR_CODE_142 = "142";
+  
+  public static final String ERROR_CODE_143 = "143";
+  
+  public static final String ERROR_CODE_144 = "144";
+  
+  public static final String ERROR_CODE_145 = "145";
+  
+  public static final String ERROR_CODE_146 = "146";
+  
+  public static final String ERROR_CODE_147 = "147";
+  
+  public static final String ERROR_CODE_148 = "148";
+  
+  public static final String ERROR_CODE_149 = "149";
+  
+  public static final String ERROR_CODE_150 = "150";
+  
+  public static final String ERROR_CODE_151 = "151";
+  
+  public static final String ERROR_CODE_152 = "152";
+  
+  public static final String ERROR_CODE_153 = "153";
+  
+  public static final String ERROR_CODE_156 = "156";
+  
+  public static final String ERROR_CODE_157 = "157";
+  
+  public static final String ERROR_CODE_158 = "158";
+  
+  public static final String ERROR_CODE_159 = "159";
+  
+  public static final String ERROR_CODE_154 = "154";
+  
+  public static final String ERROR_CODE_155 = "155";
+  
+  public static final String ERROR_CODE_161 = "161";
+  
+  public static final String ERROR_CODE_162 = "162";
+  
+  public static final String ERROR_CODE_163 = "163";
+  
+  public static final String ERROR_CODE_164 = "164";
+  
+  public static final String ERROR_CODE_165 = "165";
+  
+  public static final String ERROR_CODE_166 = "166";
+  
+  public static final String ERROR_CODE_167 = "167";
+  
+  public static final String ERROR_CODE_168 = "168";
+  
+  public static final String ERROR_CODE_169 = "169";
+  
+  public static final String ERROR_CODE_170 = "170";
+  
+  public static final String ERROR_CODE_171 = "171";
+  
+  public static final String ERROR_CODE_172 = "172";
+  
+  public static final String ERROR_CODE_173 = "173";
+  
+  public static final String ERROR_CODE_174 = "174";
+  
+  public static final String ERROR_CODE_175 = "175";
+  
+  public static final String ERROR_CODE_176 = "176";
+  
+  public static final String ERROR_CODE_177 = "177";
+  
+  public static final String ERROR_CODE_178 = "178";
+  
+  public static final String ERROR_CODE_179 = "179";
+  
+  public static final String ERROR_CODE_180 = "180";
+
+  public static final String ERROR_CODE_181 = "181";
+  
+  public static final String ERROR_CODE_182 = "182";
+  
+  public static final String ERROR_CODE_183 = "183";
+  
+  public static final String ERROR_CODE_184 = "184";
+  
+  public static final String ERROR_CODE_185 = "185";
+  
+  public static final String ERROR_CODE_186 = "186";
+  
+  public static final String ERROR_CODE_187 = "187";
+  
+  public static final String ERROR_CODE_188 = "188";
+  
+  public static final String ERROR_CODE_189 = "189";
+  
+  public static final String ERROR_CODE_190 = "190";
+  
+  public static final String ERROR_CODE_191 = "191";
+  
+  public static final String ERROR_CODE_192 = "192";
+  
+  public static final String SYSTEM_ERROR = "99";
+  public static final String ZONE_CREATED = "200";
+  public static final String ZONE_UPDATED = "201";
+  public static final String ZONE_NOT_FOUND = "202";
+  public static final String STATUS_NOT_ACTIVE = "203";
+  
+  
+
+  
+  
+  
+
+  /** Default Constructor */
+
+  public ErrorCode() {
+    initMessages();
+  }
+
+  /**
+   * This method get the message based on code
+   * 
+   * @param code
+   * @return String
+   */
+  public String getMessage(String code) {
+    Object obj = mMessages.get(code);
+    String msg = null;
+    if(obj != null)
+      msg = (String) obj;
+    else
+      msg = "Unknown Message";
+    return msg;
+  }
+
+  private void initMessages() {
+    mMessages = new HashMap(125);
+    mMessages.put(ERROR_CODE_00, "Success");
+    mMessages.put(ERROR_CODE_01, "Duplicate Requester name");
+    mMessages.put(ERROR_CODE_02, "Duplicate Requester address");
+    mMessages.put(ERROR_CODE_03, "Duplicate Requester contact person phone");
+    mMessages.put(ERROR_CODE_04, "Duplicate Requester url");
+    mMessages.put(ERROR_CODE_05, "Duplicate Requester IP");
+    mMessages.put(ERROR_CODE_06, "Requester Not Present or Not Active");
+    mMessages.put(ERROR_CODE_07, "Token Not Active");
+    mMessages.put(ERROR_CODE_08, "Token Bin Not Active");
+    mMessages.put(ERROR_CODE_09, "Token Expired");
+    mMessages.put(ERROR_CODE_10, "Invalid Token Version Number");
+    mMessages.put(ERROR_CODE_11, "An Active BIN or BIN Ext for requesterId is not present");
+    mMessages.put(ERROR_CODE_12, "Invalid Detokenize request");
+    mMessages.put(ERROR_CODE_13, "Invalid pan expiry date");
+    mMessages.put(ERROR_CODE_14, "Invalid request");
+    mMessages.put(ERROR_CODE_15, "Token not present");
+    mMessages.put(ERROR_CODE_16, "Invalid token expiry date(Accepts in 'MM/yy')");
+    mMessages.put(ERROR_CODE_17, "Expiry date should be in future");
+    mMessages.put(ERROR_CODE_18, "Token mapped to the request not present");
+    mMessages.put(ERROR_CODE_19, "Invalid Pan Number");
+    mMessages.put(ERROR_CODE_20, "A Bin is already active for this Payment Scheme");
+    mMessages.put(ERROR_CODE_21, "Duplicate Issuer name");
+    mMessages.put(ERROR_CODE_22, "BIN and BIN Ext already Exist");
+    mMessages.put(ERROR_CODE_23, "Token Requester is not in Active state");
+    mMessages.put(ERROR_CODE_24, "Token Requester is not in Active state");
+    mMessages.put(ERROR_CODE_25, "Token Bin is not mapped with the Requester ID");
+    mMessages.put(ERROR_CODE_26, "Token Requester is not Present");
+    mMessages.put(ERROR_CODE_27, "Invalid current token status");
+    mMessages.put(ERROR_CODE_28, "Cloud account is already in &@#&@# status");
+    mMessages.put(ERROR_CODE_29, "Token Bin is not mapped with the Requester ID");
+    mMessages.put(ERROR_CODE_30, "Account prameter doesnot exist");
+    mMessages.put(ERROR_CODE_31, "Invalid version Number");
+    mMessages.put(ERROR_CODE_32, "Service Provider Name already exists. Please try with other service provider name");
+    mMessages.put(ERROR_CODE_33, "Service Provider does not exist");
+    mMessages.put(ERROR_CODE_34, "Token Requestor Id already exists. Please try with other Token Requestor Id");
+    mMessages.put(ERROR_CODE_35, "Widget Name already exists. Please try with other Widget Name");
+    mMessages.put(ERROR_CODE_36, "Duplicate Wallet User Name");
+    mMessages.put(ERROR_CODE_37, "Duplicate Wallet Email Id");
+    mMessages.put(ERROR_CODE_38, "Duplicate Wallet Phone Number");
+    mMessages.put(ERROR_CODE_39, "Please Accept Terms & condition.");
+    mMessages.put(ERROR_CODE_40, "User Already Verified");
+    mMessages.put(ERROR_CODE_41, "Please enter valid verification Code");
+    mMessages.put(ERROR_CODE_42, "Account details not found");
+    mMessages.put(ERROR_CODE_43, "Wallet is Not in Active State.");
+    mMessages.put(ERROR_CODE_44, "Card Details not found.");
+    mMessages.put(ERROR_CODE_45, "Wallet Details not found.");
+    mMessages.put(ERROR_CODE_46, "Wallet is already Blocked");
+    mMessages.put(ERROR_CODE_47, "Wallet is already Active");
+    mMessages.put(ERROR_CODE_48, "Card Details not found.");
+    mMessages.put(ERROR_CODE_49, "Card Bin Profile is already Deleted");
+    mMessages.put(ERROR_CODE_50, "Account Profile is already Deleted");
+    mMessages.put(ERROR_CODE_51, "Map Parameter is already Deleted");
+    mMessages.put(ERROR_CODE_52, "Invalid OTP entered");
+    mMessages.put(ERROR_CODE_53, "Service Provider is not Active");
+    mMessages.put(ERROR_CODE_54, "Service Provider ID already exists. Please try with other Service Provider ID");
+    mMessages.put(ERROR_CODE_51, "Map Parameter is already Deleted");
+    mMessages.put(ERROR_CODE_55, "Selected Requester is not active");
+    mMessages.put(ERROR_CODE_56, "Wallet Details for the customer not found.");
+    mMessages.put(ERROR_CODE_57, "Wallet already registered for the user");
+    mMessages.put(ERROR_CODE_58, "No Data Found for this Wallet");
+    mMessages.put(ERROR_CODE_59, "OTP already authenticated");
+    mMessages.put(ERROR_CODE_60, "Profile does not exist for this BIN");
+    mMessages.put(ERROR_CODE_61, "Issuer is not Active");
+    mMessages.put(ERROR_CODE_62, "Profile Name already exist,please try with another profile name");
+    mMessages.put(ERROR_CODE_63, "The Username or Password you entered is incorrect.");
+    mMessages.put(ERROR_CODE_64, "An Active BIN or BIN Ext for the requested card payment Scheme is not present for thr Requester");
+    mMessages.put(ERROR_CODE_65, "Account Profile is not Active");
+    mMessages.put(ERROR_CODE_66, "Widget is not Active");
+    mMessages.put(ERROR_CODE_67, "HCE Issuer is not Active");
+    mMessages.put(ERROR_CODE_68, "User is not Active,please contact to admin");
+    mMessages.put(ERROR_CODE_69, "User is Blocked,please contact to admin");
+    mMessages.put(ERROR_CODE_70, "Invalid Token Requestor ID.");
+    mMessages.put(ERROR_CODE_71, "MAP Paramter is not active.");
+    mMessages.put(ERROR_CODE_72, "MAP Service Provider Name already exists. Please try with other map service provider name");
+    mMessages.put(ERROR_CODE_73, "No cards present for the user");
+    mMessages.put(ERROR_CODE_74, "Pan not found for the proxy");
+    mMessages.put(ERROR_CODE_75, "Card details not found for the proxy");
+    mMessages.put(ERROR_CODE_76, "Security Answer is invalid");
+    mMessages.put(ERROR_CODE_77, "Invalid Username");
+    mMessages.put(ERROR_CODE_78, "User Details not found.Please enter valid User Id");
+    mMessages.put(ERROR_CODE_79, "Admin user is not in active status to process your change password request");
+    mMessages.put(ERROR_CODE_80, "Old and new password should not be the same, please try with new password");
+    mMessages.put(ERROR_CODE_81, "Account Profile is not Active");
+    mMessages.put(ERROR_CODE_82, "Account Details not found for this proxy");
+    mMessages.put(ERROR_CODE_83, "Cloud Account is not active for this proxy");
+    mMessages.put(ERROR_CODE_84, "Card Parameter not found");
+    mMessages.put(ERROR_CODE_85, "Card Parameter is not active");
+    mMessages.put(ERROR_CODE_86, "Card Bin Profile not found");
+    mMessages.put(ERROR_CODE_87, "Card Bin Profile is not active");
+    mMessages.put(ERROR_CODE_88, "Card Bin Profile is not active");
+    mMessages.put(ERROR_CODE_89, "Wallet is already registerd");
+    mMessages.put(ERROR_CODE_90, "Issuer Code is not configured");
+    mMessages.put(ERROR_CODE_91, "SPTSM Issuer is not Active");
+    mMessages.put(ERROR_CODE_92, "This Card is already been downloaded.");
+    mMessages.put(ERROR_CODE_93, "Bin and binExts of paymentScheme to requester is already present");
+    mMessages.put(ERROR_CODE_94, "Invalid Hce Issuer Id");
+    mMessages.put(ERROR_CODE_95, "SpTsm Hce Parameter is not configured");
+    mMessages.put(ERROR_CODE_96, "Invalid SPTSM Issuer Id");
+    mMessages.put(ERROR_CODE_97, "OTP Expired...Please Regenerate The OTP");
+    mMessages.put(ERROR_CODE_100, "Invalid SPTSM Issuer Id");
+    mMessages.put(ERROR_CODE_101, "HCE Code is not configured");
+    mMessages.put(ERROR_CODE_102, "Invalid Issuer Details");
+    mMessages.put(ERROR_CODE_103, "Invalid Hce Details");
+    mMessages.put(ERROR_CODE_104, "User is not configured");
+    mMessages.put(ERROR_CODE_105, "OTP expired Please Regenerate the OTP");
+    mMessages.put(ERROR_CODE_106, "Wallet User already Verified with OTP");
+    mMessages.put(ERROR_CODE_107, "Device Registration Id not found");
+    mMessages.put(ERROR_CODE_108, "The Requested Card for Download is Not Active");
+    mMessages.put(ERROR_CODE_109, " Admin user already exists with same e-mail id");
+    mMessages.put(ERROR_CODE_110, " Admin user already exists.Please try with different username.");
+    mMessages.put(ERROR_CODE_111, " Role name already exist.Please choose different Role name.");
+    mMessages.put(ERROR_CODE_112, " User Details Not Found.Please Enter valid User Details.");
+    mMessages.put(ERROR_CODE_113, " Issuer Code is not configured for the BinExt: #####$$$$.");
+    mMessages.put(ERROR_CODE_114, " Please Enter a Valid Pan Num");
+    mMessages.put(ERROR_CODE_115,  "Pan num given is Not active");
+    mMessages.put(ERROR_CODE_116, " New password should not be same as 3 previous passwords.");
+    mMessages.put(ERROR_CODE_117, " Your password has expired. Please change your password.");
+    mMessages.put(ERROR_CODE_118, " User is requested to change the system generated password.");
+    mMessages.put(ERROR_CODE_119, " Reset your password.");
+    mMessages.put(ERROR_CODE_120, " Your account is blocked due to wrong password attempts. Please contact administrator.");
+    mMessages.put(ERROR_CODE_121, " Your account is suspended. Please contact administrator.");
+    mMessages.put(ERROR_CODE_122, " Invalid BinExt");
+    mMessages.put(ERROR_CODE_123, " Following BinExt are Already Mapped to Bin");
+    mMessages.put(ERROR_CODE_124, "Expiry Date is Not Valid");
+    mMessages.put(ERROR_CODE_125, "Role is not Active");
+    mMessages.put(ERROR_CODE_126, "User is not Active");
+    mMessages.put(ERROR_CODE_127, " Current Password is not valid.");
+    mMessages.put(ERROR_CODE_128, "Please select the valid Hex Decimal file");
+    mMessages.put(ERROR_CODE_129, "HCE Server Name already exists");
+    mMessages.put(ERROR_CODE_131, "Role is not Active");
+    mMessages.put(ERROR_CODE_133, "Invalid Cryptogram Key");
+    mMessages.put(ERROR_CODE_134, "Invalid EMV Data Format Exception");
+    mMessages.put(ERROR_CODE_135, "Invalid Unpredictable number");
+    mMessages.put(ERROR_CODE_136, "Transaction Log details not found");
+    mMessages.put(ERROR_CODE_137, "Please select .txt Hex Decimal file");
+    mMessages.put(ERROR_CODE_138, "Invalid Application Cryptogram data");
+	mMessages.put(ERROR_CODE_139, "Master Derivation Key not available for this Bin");
+	mMessages.put(ERROR_CODE_140, "Cloud Account details does not Exist.");
+	mMessages.put(ERROR_CODE_141, "Invalid Transaction time. Log verification failed");
+    mMessages.put(ERROR_CODE_142, "Invalid Transaction Amount. Log verification failed");
+    mMessages.put(ERROR_CODE_143, "Invalid Unpredictable number. Log verification failed");
+    mMessages.put(ERROR_CODE_144, "log verification time expired");
+    mMessages.put(ERROR_CODE_145, "The ATC is already present in the System");
+    mMessages.put(ERROR_CODE_146, "Wallet Id is not mapped to Cloud Account Id");
+	mMessages.put(ERROR_CODE_147, "Status is already $$$##");
+	mMessages.put(ERROR_CODE_148, "Status Updated to $$$## Successfully");
+	mMessages.put(ERROR_CODE_149, "Device ID not found");
+	mMessages.put(ERROR_CODE_150, "Device ID not matched");
+	mMessages.put(ERROR_CODE_151, "MAP server parameter has not been configured");
+	mMessages.put(ERROR_CODE_152, "Location not matched");
+	mMessages.put(ERROR_CODE_153, "CVM is not performed properly");
+	mMessages.put(ERROR_CODE_156, "Invalid Token Issuer ID");
+	mMessages.put(ERROR_CODE_157, "Issuer ID is Already Mapped to Issuer Name : $$###");
+	mMessages.put(ERROR_CODE_158, "Digitized Card that is still being provisioned");
+	mMessages.put(ERROR_CODE_159, "Digitized Card need to be provisioned");
+	mMessages.put(ERROR_CODE_154, "Invalid Activation code");
+	mMessages.put(ERROR_CODE_155, "Mobile Device Not Supported");
+	mMessages.put(ERROR_CODE_161, "Issuer Parameter is not configured on Token Server");
+	mMessages.put(ERROR_CODE_162, "Issuer Parameter on Token Server is not Active");
+	mMessages.put(ERROR_CODE_163, "Issuer Parameter on Token Server is Deleted");
+	mMessages.put(ERROR_CODE_164, "Token Server Parameter is not configured on HCE Server");
+	mMessages.put(ERROR_CODE_165, "Token Server Parameter on HCE Server is not Active");
+	mMessages.put(ERROR_CODE_166, "Token Server Parameter on HCE Server is Deleted");
+	mMessages.put(ERROR_CODE_167, "Issuer Parameter is not configured on HCE Server");
+	mMessages.put(ERROR_CODE_168, "Issuer Parameter on HCE Server is not Active");
+	mMessages.put(ERROR_CODE_169, "Issuer Parameter on HCE Server is Deleted");
+	mMessages.put(ERROR_CODE_170, "MAP Server Parameter is not configured on HCE Server");
+	mMessages.put(ERROR_CODE_171, "MAP Server Parameter on HCE Server is not Active");
+	mMessages.put(ERROR_CODE_172, "MAP Server Parameter on HCE Server is Deleted");
+	mMessages.put(ERROR_CODE_173, "Issuer Parameter is not configured on SPTSM Server");
+	mMessages.put(ERROR_CODE_174, "Issuer Parameter on SPTSM Server is not Active");
+	mMessages.put(ERROR_CODE_175, "Issuer Parameter on SPTSM Server is Deleted");
+	mMessages.put(ERROR_CODE_176, "HCE Server Parameter is not configured on SPTSM Server");
+	mMessages.put(ERROR_CODE_177, "HCE Server Parameter on SPTSM Server is not Active");
+	mMessages.put(ERROR_CODE_178, "HCE Server Parameter on SPTSM Server is Deleted");
+	mMessages.put(ERROR_CODE_179, "Token Requestor ID is Deleted");
+	mMessages.put(ERROR_CODE_180, "$$ Issuer ID is Already mapped to ## Issuer ID");
+	mMessages.put(ERROR_CODE_181, "card status is not active");
+	mMessages.put(ERROR_CODE_182, "Digitized Card has been suspended successfully");
+	mMessages.put(ERROR_CODE_183, "CMS is in process of reaching out to the Mobile to replenish the DC_SUK data");
+	mMessages.put(ERROR_CODE_184, "Unable to reach mobile application");
+	mMessages.put(ERROR_CODE_186, "Invalid Token Number");
+	mMessages.put(ERROR_CODE_187, "Invalid Wallet ID");
+	mMessages.put(ERROR_CODE_188, "MPA Details not found");
+	mMessages.put(ERROR_CODE_189, "Cryptogram Verification failed for the MD Contactless Magstripe transaction");
+	mMessages.put(ERROR_CODE_190, "Cryptogram Verification failed for the UMD Contactless Magstripe transaction");
+	mMessages.put(ERROR_CODE_191, "Cryptogram Verification failed for the MD Contactless MChip transaction");
+	mMessages.put(ERROR_CODE_192, "Cryptogram Verification failed for the UMD Contactless MChip transaction");
+	
+	//added for zone management 
+	
+	
+	
+
+	mMessages.put(ERROR_CODE_98, "All Fields in are Mandatory");
+	mMessages.put(ERROR_CODE_99, "System error");
+  }
+
+  /**
+   * Returns the singleton instance.
+   * 
+   * @return the singleton instance
+   */
+  public static final synchronized ErrorCode getInstance() {
+    if(mInstance == null) {
+      mInstance = new ErrorCode();
+    }
+    return mInstance;
+  }
+
+}

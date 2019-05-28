@@ -1,0 +1,20 @@
+package com.chatak.beacon.dao.repository;
+
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+
+import com.chatak.beacon.dao.model.BeaconZoneMap;
+
+public interface BeaconZoneMapRepository extends JpaRepository<BeaconZoneMap, Long>, QueryDslPredicateExecutor<BeaconZoneMap> {
+	
+	public BeaconZoneMap findById(Long id);
+	
+	public List<BeaconZoneMap> findByBeaconId(Long beaconId);
+	
+	public List<BeaconZoneMap> findByZoneId(Long zoneId);
+
+
+}

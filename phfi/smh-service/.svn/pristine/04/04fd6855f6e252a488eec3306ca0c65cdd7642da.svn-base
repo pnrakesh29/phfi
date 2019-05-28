@@ -1,0 +1,59 @@
+package com.chatak.beacon.dao.model;
+
+import static com.mysema.query.types.PathMetadataFactory.*;
+
+import com.mysema.query.types.path.*;
+
+import com.mysema.query.types.PathMetadata;
+import javax.annotation.Generated;
+import com.mysema.query.types.Path;
+
+
+/**
+ * QBeacon is a Querydsl query type for Beacon
+ */
+@Generated("com.mysema.query.codegen.EntitySerializer")
+public class QBeacon extends EntityPathBase<Beacon> {
+
+    private static final long serialVersionUID = -426255952L;
+
+    public static final QBeacon beacon = new QBeacon("beacon");
+
+    public final StringPath beaconId = createString("beaconId");
+
+    public final StringPath beaconName = createString("beaconName");
+
+    public final StringPath createdBy = createString("createdBy");
+
+    public final DateTimePath<java.sql.Timestamp> createdDate = createDateTime("createdDate", java.sql.Timestamp.class);
+
+    public final StringPath desc = createString("desc");
+
+    public final DateTimePath<java.sql.Timestamp> expDate = createDateTime("expDate", java.sql.Timestamp.class);
+
+    public final StringPath make = createString("make");
+
+    public final StringPath manufacturer = createString("manufacturer");
+
+    public final StringPath model = createString("model");
+
+    public final StringPath status = createString("status");
+
+    public final StringPath updatedBy = createString("updatedBy");
+
+    public final DateTimePath<java.sql.Timestamp> updatedDate = createDateTime("updatedDate", java.sql.Timestamp.class);
+
+    public QBeacon(String variable) {
+        super(Beacon.class, forVariable(variable));
+    }
+
+    public QBeacon(Path<? extends Beacon> path) {
+        super(path.getType(), path.getMetadata());
+    }
+
+    public QBeacon(PathMetadata<?> metadata) {
+        super(Beacon.class, metadata);
+    }
+
+}
+

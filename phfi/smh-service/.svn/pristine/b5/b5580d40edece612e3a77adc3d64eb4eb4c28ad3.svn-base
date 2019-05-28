@@ -1,0 +1,30 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.UserRole;
+import com.chatak.beacon.dao.model.UserRoleEntityMap;
+import com.chatak.beacon.model.UserRoleRequest;
+
+
+
+
+
+public interface UserRoleDao {
+	
+	public UserRole saveOrUpdateUserRole(UserRole userRole)  throws DataAccessException;
+	
+	public UserRoleEntityMap saveOrUpdateUserRoleEntityMap(UserRoleEntityMap userRoleEntityMap) throws DataAccessException;
+	
+	public List<UserRoleRequest> searchRoles(UserRoleRequest roleRequest) throws DataAccessException, Exception;
+	
+	public List<UserRoleRequest> getUserRolesByRoleTypes(UserRoleRequest userRoleRequest) throws DataAccessException, Exception;
+	
+    public UserRole findByUserRoleId(Long userRoleId) throws DataAccessException,Exception;
+	
+	public List<UserRole> findByRoleName(String name)throws DataAccessException,Exception; 
+	
+	
+}

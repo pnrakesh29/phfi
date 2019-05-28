@@ -1,0 +1,123 @@
+package com.chatak.beacon.rest.service.impl;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.chatak.beacon.handler.LocationHandler;
+import com.chatak.beacon.model.ChangeStatusRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.LocationResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.rest.service.RestLocationService;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 25-May-2015 4:24:13 PM
+ * @version 1.0
+ */
+@RestController
+@RequestMapping(value = "/locationService", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestLocationServiceImpl implements RestLocationService {
+
+	private static Logger logger = Logger.getLogger(RestLocationServiceImpl.class);
+	
+	@Autowired
+	private LocationHandler locationHandler;
+	
+	@Override
+	@RequestMapping(value = "/createLocation", method = RequestMethod.POST)
+	public Response createLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody LocationRequest locationRequest) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: createLocation method");
+	    Response locationResponse = locationHandler.createLocation(locationRequest);
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: createLocation method");
+	    return locationResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/searchLocation", method = RequestMethod.POST)
+	public LocationResponse searchLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody LocationRequest locationRequest) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: searchLocation method");
+	    LocationResponse locationResponse = locationHandler.searchLocation(locationRequest);
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: searchLocation method");
+	    return locationResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/updateLocation", method = RequestMethod.POST)
+	public Response updateLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody LocationRequest locationRequest) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: updateLocation method");
+	    Response accountProfileResponse = locationHandler.updateLocation(locationRequest);
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: updateLocation method");
+	    return accountProfileResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/findLocationDetails", method = RequestMethod.POST)
+	public LocationResponse findLocationDetails(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, @RequestBody Long id) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: findLocationDetails method");
+		LocationResponse locationResponse = locationHandler.findLocationById(id);
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: findLocationDetails method");
+	    return locationResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/{id}/deleteLocation", method = RequestMethod.POST)
+	public Response deleteLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, @PathVariable Long id) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: deleteLocation method");
+	    Response locationResponse = locationHandler.deleteLocation(id);
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: deleteLocation method");
+	    return locationResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/{id}/changeStatus", method = RequestMethod.POST)
+	public Response changeStatus(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody ChangeStatusRequest changeStatusRequest) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: changeStatus method");
+	    Response locationResponse = locationHandler.changeStatus(changeStatusRequest);
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: changeStatus method");
+	    return locationResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/getAllActiveLocations", method = RequestMethod.POST)
+	public LocationResponse getAllActiveLocations(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: getAllActiveLocations method");
+		LocationResponse locationResponse = locationHandler.getAllActiveLocations();
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: getAllActiveLocations method");
+	    return locationResponse;
+	}
+	
+	@Override
+	@RequestMapping(value = "/getAllLocations", method = RequestMethod.POST)
+	public LocationResponse getAllLocations(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) {
+		logger.info("Entering :: RestController :: RestLocationServiceImpl :: getAllLocations method");
+		LocationResponse locationResponse = locationHandler.getAllActiveLocations();
+	    logger.info("Exiting :: RestController :: RestLocationServiceImpl :: getAllLocations method");
+	    return locationResponse;
+	}
+
+}

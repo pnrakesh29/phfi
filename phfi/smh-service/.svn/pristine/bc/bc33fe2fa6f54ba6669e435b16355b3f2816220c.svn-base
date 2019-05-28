@@ -1,0 +1,84 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.dao.StylopayFeatureDao;
+import com.chatak.beacon.dao.model.QStylopayFeature;
+import com.chatak.beacon.dao.model.QUserRoleFeatureMap;
+import com.chatak.beacon.dao.model.StylopayFeature;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.OrderSpecifier;
+import com.mysema.query.types.expr.BooleanExpression;
+
+
+@Repository("stylopayFeatureDao")
+public class StylopayFeatureDaoImpl implements StylopayFeatureDao {
+
+	@PersistenceContext
+	  private EntityManager entityManager;
+	
+	
+	@Override
+	public List<StylopayFeature> getFeatureList(String status)throws DataAccessException {
+		JPAQuery query = new JPAQuery(entityManager);
+		QStylopayFeature qstylopayFeature = QStylopayFeature.stylopayFeature;
+		List<StylopayFeature> userList = query.from(qstylopayFeature)
+										.where(isStatus(status))
+										.orderBy(orderByFeatureLevelDesc())
+										.list(qstylopayFeature);
+		return (userList);
+	}
+
+	private BooleanExpression isStatus(String status) {
+		return (status != null && !"".equals(status))?  QStylopayFeature.stylopayFeature.status.eq(status)	: null;
+	}
+	
+	
+	@Override
+	public List<Long> getFeatureDataOnRoleIdData(Long roleId)
+			throws DataAccessException {
+		JPAQuery query = new JPAQuery(entityManager);
+		QStylopayFeature qstylopayFeature = QStylopayFeature.stylopayFeature;
+		QUserRoleFeatureMap qUserRoleFeatureMap = QUserRoleFeatureMap.userRoleFeatureMap;
+		List<Long> userList = query.from(qUserRoleFeatureMap,qstylopayFeature)
+									.where(isRoleId(roleId),
+									QStylopayFeature.stylopayFeature.featureId.eq(QUserRoleFeatureMap.userRoleFeatureMap.featureId))
+									.list(qUserRoleFeatureMap.featureId);
+		return userList;
+	}
+
+	private BooleanExpression isRoleId(Long roleId){
+		return roleId != null ? QUserRoleFeatureMap.userRoleFeatureMap.roleId.eq(roleId) : null;
+	}
+	
+	@Override
+	public List<StylopayFeature> getFeatureOnRoleLevel(String roleLevel,String status) throws DataAccessException {
+		JPAQuery query = new JPAQuery(entityManager);
+		QStylopayFeature qstylopayFeature =  QStylopayFeature.stylopayFeature;
+		List<StylopayFeature> userList = query.from(QStylopayFeature.stylopayFeature)
+											.where(isStatus(status),
+											 isRoleLevel(roleLevel))
+											.orderBy(orderByFeatureIDDesc())
+											.list(qstylopayFeature);
+		return userList;
+	}
+	
+	private OrderSpecifier<Long> orderByFeatureIDDesc() {
+		return QStylopayFeature.stylopayFeature.featureId.asc();
+	}
+	
+	private OrderSpecifier<Long> orderByFeatureLevelDesc() {
+		return QStylopayFeature.stylopayFeature.featureLevel.asc();
+	}
+	
+	private BooleanExpression isRoleLevel(String roleLevel) {
+		return (roleLevel != null && !"".equals(roleLevel))? QStylopayFeature.stylopayFeature.roleType.eq(roleLevel)	: null;
+	}
+
+}

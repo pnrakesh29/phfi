@@ -1,0 +1,408 @@
+package com.chatak.beacon.handler.impl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.BeaconDao;
+import com.chatak.beacon.dao.model.Beacon;
+import com.chatak.beacon.dao.model.BeaconLocationMap;
+import com.chatak.beacon.dao.model.BeaconZoneMap;
+import com.chatak.beacon.handler.BeaconHandler;
+import com.chatak.beacon.model.BeaconLocationMapRequest;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconResponse;
+import com.chatak.beacon.model.BeaconZoneMapRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.Option;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneManagementRequest;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.StringUtil;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:50:23 AM
+ * @version 1.0
+ */
+
+@Service("beaconHandler")
+public class BeaconHandlerImpl implements BeaconHandler{
+	
+	private static Logger logger = Logger.getLogger(BeaconHandlerImpl.class);	
+	
+	@Autowired
+	private BeaconDao beaconDao;
+	
+	@Override
+	public Response createBeacon(BeaconRequest beaconRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: createBeacon method");
+		Response response = new Response();
+
+		try{
+			
+			List<Beacon> findBeacon = beaconDao.findByBeaconId(beaconRequest.getBeaconId());
+			if(StringUtil.isListNotNullNEmpty(findBeacon)) {
+				response.setResponseCode(ErrorCode.ERROR_CODE_62);
+				response.setResponseMessage("Beacon is Already Registred");
+				return response;
+			}
+			
+			List<Beacon> findBeaconName = beaconDao.findByBeaconName(beaconRequest.getBeaconName());
+			if(StringUtil.isListNotNullNEmpty(findBeaconName)) {
+				response.setResponseCode(ErrorCode.ERROR_CODE_62);
+				response.setResponseMessage("Beacon is Already Registred");
+				return response;
+			}
+			
+			beaconRequest.setExpDate(DateUtil.appendToTime(beaconRequest.getExpDate()));
+			Beacon beacon = CommonUtil.copyBeanProperties(beaconRequest, Beacon.class);
+			beacon.setExpDate(DateUtil.toTimestamp(beaconRequest.getExpDate(),DateUtil.viewDateTimeFormat));
+			beacon.setStatus(Constant.ACTIVE);
+			beacon.setCreatedBy(Constant.CREATED_BY);
+			beacon.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+			beaconDao.createBeacon(beacon);
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+			
+			
+		}catch (Exception ex) {
+			logger.error("Error :: BeaconHandlerImpl :: createBeacon method", ex);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: createBeacon method");
+		
+		return response;
+	}
+	
+	@Override
+	public BeaconResponse findAllBeacons() {
+		logger.info("Entering :: BeaconHandlerImpl :: findAllBeacons method");
+		BeaconResponse response = new BeaconResponse();
+		List<BeaconRequest> responseList = null;
+		try{
+			List<Beacon> beacon = beaconDao.getAllBeacons();
+			responseList = CommonUtil.copyListBeanProperty(beacon, BeaconRequest.class);
+			for(int i=0 ;i<responseList.size();i++){
+			responseList.get(i).setExpDate(DateUtil.timeStamptoStringFormat(beacon.get(i).getExpDate(),DateUtil.viewDateFormat));
+			}
+			response.setBeaconRequests(responseList);
+			response.setNoOfRecords(beacon.size());
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+		    response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+		} catch (Exception e) {
+			logger.error("Error :: BeaconHandlerImpl :: findAllBeacons method", e);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: findAllBeacons method");
+		
+		return response;
+	}
+	
+	@Override
+	public Response beaconLocationMapRequest(BeaconLocationMapRequest locationMapRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: beaconLocationMapRequest method");
+		Response response = new Response();
+
+		try{
+			List<BeaconLocationMap> beaconLocationMap = beaconDao.findByLocationBeaconId(locationMapRequest.getBeaconId());
+				
+				if(StringUtil.isListNotNullNEmpty(beaconLocationMap)) {
+					response.setResponseCode(ErrorCode.ERROR_CODE_62);
+					response.setResponseMessage("Selected Beacon is already Mapped with other Location");
+					return response;
+				}
+
+				BeaconLocationMap locationMap = CommonUtil.copyBeanProperties(locationMapRequest, BeaconLocationMap.class);
+				beaconDao.mapBeaconLocation(locationMap);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+						
+			
+		}catch (Exception ex) {
+			logger.error("Error :: BeaconHandlerImpl :: beaconLocationMapRequest method", ex);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: beaconLocationMapRequest method");
+		
+		return response;
+	}
+	
+	@Override
+	public Response searchBeaconLocationMapRequest(BeaconLocationMapRequest searchRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: searchBeaconLocationMapRequest method");
+		Response response = new Response();
+
+		try{
+			
+			List<BeaconLocationMapRequest> beaconMaps = beaconDao.searchBeanconLocationMap(searchRequest);
+			response.setResponseList(beaconMaps);
+			response.setNoOfRecords(searchRequest.getNoOfRecords());
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+		    response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+							
+		}catch (Exception ex) {
+			logger.error("Error :: BeaconHandlerImpl :: searchBeaconLocationMapRequest method", ex);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: searchBeaconLocationMapRequest method");
+		
+		return response;
+	}
+	
+	@Override
+	public BeaconLocationMapRequest getBeaconLocationMapRequestDtls(BeaconLocationMapRequest searchRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: getBeaconLocationMapRequestDtls method");
+		
+		try{
+			BeaconLocationMap beaconLocationMap = beaconDao.findByLocationMapBeaconId(searchRequest.getBeaconId(),searchRequest.getLocationId());
+			if(null != beaconLocationMap){
+				searchRequest.setBeaconId(beaconLocationMap.getBeaconId());
+				searchRequest.setLocationId(beaconLocationMap.getLocationId());
+				searchRequest.setAddr1(beaconLocationMap.getAddr1());
+				searchRequest.setAddr2(beaconLocationMap.getAddr2());
+				searchRequest.setCity(beaconLocationMap.getCity());
+				searchRequest.setLocName(beaconLocationMap.getLocName());
+				searchRequest.setCountry(beaconLocationMap.getCountry());
+				searchRequest.setState(beaconLocationMap.getState());
+				searchRequest.setZip(beaconLocationMap.getZip());
+				
+				return searchRequest;
+				
+			}
+		}catch(Exception ex){
+			logger.error("Error :: BeaconHandlerImpl :: getBeaconLocationMapRequestDtls method", ex);
+				
+			}
+			return null;
+		  }
+		
+			
+	@Override
+	public Response beaconLocationUpdateMapRequest(BeaconLocationMapRequest mapUpdateRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: beaconLocationUpdateMapRequest method");
+		Response response = new Response();
+		
+		try{
+			System.out.println("inside not null^^^^^^^^^^^"+mapUpdateRequest.getBeaconId());
+			System.out.println("inside not null^^^^^^^^^^^"+mapUpdateRequest.getLocationId());
+			BeaconLocationMap beaconLocationMap = beaconDao.findByLocationMapBeaconId(mapUpdateRequest.getBeaconId(),mapUpdateRequest.getLocationId());
+			
+			if(null != beaconLocationMap){
+				System.out.println("inside not null^^^^^^^^^^^");
+
+				beaconLocationMap = CommonUtil.copyBeanProperties(mapUpdateRequest, BeaconLocationMap.class);
+				beaconDao.mapBeaconLocation(beaconLocationMap);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+			}
+			
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error("Error :: BeaconHandlerImpl :: beaconLocationUpdateMapRequest method", ex);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: beaconLocationUpdateMapRequest method");
+		
+		return response;
+	}
+	
+	@Override
+	public Response beaconZoneMapRequest(BeaconZoneMapRequest mapRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: beaconZoneMapRequest method");
+		Response response = new Response();
+
+		try{
+			BeaconZoneMap beaconMap = beaconDao.findByZoneBeaconId(mapRequest.getBeaconId());
+			
+			if(beaconMap != null){
+
+				beaconMap.setZoneId(mapRequest.getZoneId());
+				beaconDao.mapBeaconZone(beaconMap);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+				
+			}else{
+				
+				BeaconZoneMap beaconZoneMap = new BeaconZoneMap();
+				beaconZoneMap.setBeaconId(Long.valueOf(mapRequest.getBeaconId()));
+				beaconZoneMap.setZoneId(Long.valueOf(mapRequest.getZoneId()));
+				beaconDao.mapBeaconZone(beaconZoneMap);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+					
+			}
+				
+			
+		}catch (Exception ex) {
+			logger.error("Error :: BeaconHandlerImpl :: beaconZoneMapRequest method", ex);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: beaconZoneMapRequest method");
+		
+		return response;
+	}
+	
+	@Override
+	  public Response getBeaconsList() {
+	    Response response = new Response();
+	    logger.info("Entering :: BeaconHandlerImpl :: getBeaconsList method");
+	    try {
+	      List<BeaconRequest> beaconRequests = beaconDao.findAllBeacons();
+	      if(StringUtil.isListNotNullNEmpty(beaconRequests)) {
+	        List<Option> options = new ArrayList<Option>();
+	        if(beaconRequests != null) {
+	          for(BeaconRequest beaconRequest : beaconRequests) {
+	            Option option = new Option();
+	            option.setLabel(beaconRequest.getBeaconId());
+	            option.setValue(String.valueOf(beaconRequest.getId()));
+	            options.add(option);
+	          }
+	        }
+	        Collections.sort(options, ALPHABETICAL_ORDER);
+	        response.setResponseList(options);
+	        response.setResponseCode(ErrorCode.ERROR_CODE_00);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+	      }
+	      else {
+	        response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	      }
+
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: BeaconHandlerImpl :: getBeaconsList method", e);
+	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	    }
+	    logger.info("Exiting :: BeaconHandlerImpl :: getBeaconsList method");
+	    return response;
+	  }
+	
+	@Override
+	  public Response getLocationsList() {
+	    Response response = new Response();
+	    logger.info("Entering :: BeaconHandlerImpl :: getLocationsList method");
+	    try {
+	      List<LocationRequest> locationRequests = beaconDao.findAllLocations();
+	      if(StringUtil.isListNotNullNEmpty(locationRequests)) {
+	        List<Option> options = new ArrayList<Option>();
+	        if(locationRequests != null) {
+	          for(LocationRequest locationRequest : locationRequests) {
+	            Option option = new Option();
+	            option.setLabel(locationRequest.getName());
+	            option.setValue(locationRequest.getLocationId());
+	            options.add(option);
+	          }
+	        }
+	        Collections.sort(options, ALPHABETICAL_ORDER);
+	        response.setResponseList(options);
+	        response.setResponseCode(ErrorCode.ERROR_CODE_00);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+	      }
+	      else {
+	        response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	      }
+
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: BeaconHandlerImpl :: getLocationsList method", e);
+	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	    }
+	    logger.info("Exiting :: BeaconHandlerImpl :: getLocationsList method");
+	    return response;
+	  }
+	
+	@Override
+	  public Response getZonesList() {
+	    Response response = new Response();
+	    logger.info("Entering :: BeaconHandlerImpl :: getZonesList method");
+	    try {
+	      List<ZoneManagementRequest> zoneRequests = beaconDao.findAllZones();
+	      if(StringUtil.isListNotNullNEmpty(zoneRequests)) {
+	        List<Option> options = new ArrayList<Option>();
+	        if(zoneRequests != null) {
+	          for(ZoneManagementRequest zoneManagementRequest : zoneRequests) {
+	            Option option = new Option();
+	            option.setLabel(zoneManagementRequest.getZoneId());
+	            option.setValue(String.valueOf(zoneManagementRequest.getId()));
+	            options.add(option);
+	          }
+	        }
+	        Collections.sort(options, ALPHABETICAL_ORDER);
+	        response.setResponseList(options);
+	        response.setResponseCode(ErrorCode.ERROR_CODE_00);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+	      }
+	      else {
+	        response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	      }
+
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: BeaconHandlerImpl :: getZonesList method", e);
+	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	    }
+	    logger.info("Exiting :: BeaconHandlerImpl :: getZonesList method");
+	    return response;
+	  }
+	
+	@Override
+	public Response getBeaconZoneMapDisplayList(BeaconZoneMapRequest searchRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: getBeaconZoneMapDisplayList method");
+		Response response = new Response();
+
+		try{
+			
+			List<BeaconZoneMapRequest> beaconMaps = beaconDao.getBeaconZoneMapList(searchRequest);
+			response.setResponseList(beaconMaps);
+			response.setNoOfRecords(searchRequest.getNoOfRecords());
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+		    response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+							
+		}catch (Exception ex) {
+			logger.error("Error :: BeaconHandlerImpl :: getBeaconZoneMapDisplayList method", ex);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: getBeaconZoneMapDisplayList method");
+		
+		return response;
+	}
+	
+	
+	/**
+	   * Comparator method for option class
+	   */
+	  private static Comparator<Option> ALPHABETICAL_ORDER = new Comparator<Option>() {
+	    public int compare(Option str1, Option str2) {
+	      int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getValue(), str2.getValue());
+	      if(res == 0) {
+	        res = str1.getValue().compareTo(str2.getValue());
+	      }
+	      return res;
+	    }
+	  };
+	  
+}

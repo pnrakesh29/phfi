@@ -1,0 +1,27 @@
+package com.chatak.beacon.model;
+
+public class BeaconZoneMapRequest extends SearchRequest{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1681216658956073998L;
+	private Long zoneId;
+	private Long beaconId;
+	
+	public Long getZoneId() {
+		return zoneId;
+	}
+	public void setZoneId(Long zoneId) {
+		this.zoneId = zoneId;
+	}
+	public Long getBeaconId() {
+		return beaconId;
+	}
+	public void setBeaconId(Long beaconId) {
+		this.beaconId = beaconId;
+	}
+	
+	
+
+}

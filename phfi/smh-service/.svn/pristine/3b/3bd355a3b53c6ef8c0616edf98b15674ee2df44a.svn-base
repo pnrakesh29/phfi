@@ -1,0 +1,21 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.LoginSessionDetails;
+import com.chatak.beacon.model.LoginSessionDetailsRequest;
+
+public interface LoginSessionDetailsDao {
+
+	public LoginSessionDetails saveOrUpdateSessionDetails(LoginSessionDetails sessionDetails)  throws DataAccessException;
+	
+	public List<LoginSessionDetailsRequest> searchLoginSessionDetails(LoginSessionDetailsRequest loginSessionDetails) throws InstantiationException, IllegalAccessException;
+	
+	public Boolean updateLoginSessionDetails() throws DataAccessException;
+	
+	public void loginSessionDetailsExpiry(Long expiryMinutes) throws DataAccessException;
+	
+	public String getSessionId(LoginSessionDetailsRequest loginSessionDetails) throws DataAccessException, Exception;
+}

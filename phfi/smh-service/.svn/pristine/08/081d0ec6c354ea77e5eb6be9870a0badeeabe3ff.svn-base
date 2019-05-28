@@ -1,0 +1,53 @@
+package com.chatak.beacon.dao.model;
+
+import static com.mysema.query.types.PathMetadataFactory.*;
+
+import com.mysema.query.types.path.*;
+
+import com.mysema.query.types.PathMetadata;
+import javax.annotation.Generated;
+import com.mysema.query.types.Path;
+
+
+/**
+ * QBeaconLocationMap is a Querydsl query type for BeaconLocationMap
+ */
+@Generated("com.mysema.query.codegen.EntitySerializer")
+public class QBeaconLocationMap extends EntityPathBase<BeaconLocationMap> {
+
+    private static final long serialVersionUID = 1219319191L;
+
+    public static final QBeaconLocationMap beaconLocationMap = new QBeaconLocationMap("beaconLocationMap");
+
+    public final StringPath addr1 = createString("addr1");
+
+    public final StringPath addr2 = createString("addr2");
+
+    public final StringPath beaconId = createString("beaconId");
+
+    public final StringPath city = createString("city");
+
+    public final StringPath country = createString("country");
+
+    public final StringPath locationId = createString("locationId");
+
+    public final StringPath locName = createString("locName");
+
+    public final StringPath state = createString("state");
+
+    public final StringPath zip = createString("zip");
+
+    public QBeaconLocationMap(String variable) {
+        super(BeaconLocationMap.class, forVariable(variable));
+    }
+
+    public QBeaconLocationMap(Path<? extends BeaconLocationMap> path) {
+        super(path.getType(), path.getMetadata());
+    }
+
+    public QBeaconLocationMap(PathMetadata<?> metadata) {
+        super(BeaconLocationMap.class, metadata);
+    }
+
+}
+

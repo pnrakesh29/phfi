@@ -1,0 +1,16 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.model.ZoneManagementRequest;
+
+public interface ZoneDao {
+	
+	public void createOrUpdate(Zone zone);
+
+	public List<Zone> findByZoneId(String zoneId);
+
+	public List<Zone> searchZone(ZoneManagementRequest zoneManagementRequest);
+
+}

@@ -1,0 +1,18 @@
+package com.chatak.beacon.dao.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.model.LocationRequest;
+
+public interface LocationRepository extends JpaRepository<Location, Long>, QueryDslPredicateExecutor<Location> {
+
+	public Location findById(Long id);
+	
+	public List<Location> findByLocationName(String locationName);
+	
+	public List<LocationRequest> findByStatus(String status);
+}

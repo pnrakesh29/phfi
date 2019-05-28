@@ -1,0 +1,151 @@
+package com.chatak.beacon.rest.service.impl;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.chatak.beacon.handler.BeaconHandler;
+import com.chatak.beacon.model.BeaconLocationRequest;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconResponse;
+import com.chatak.beacon.model.BeaconZoneMapRequest;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.rest.service.RestBeaconService;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:30:23 AM
+ * @version 1.0
+ */
+@RestController
+@RequestMapping(value = "/beaconService", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestBeaconServiceImpl implements RestBeaconService {
+
+	private static Logger logger = Logger.getLogger(RestBeaconServiceImpl.class);
+
+	@Autowired
+	BeaconHandler beaconHandler;
+
+	@RequestMapping(value = "/registerBeacon", method = RequestMethod.POST)
+	public Response registerBeaconDevice(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconRequest beaconRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: registerBeaconDevice method");
+		Response beaconResponse = beaconHandler.createOrUpdateBeacon(beaconRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: registerBeaconDevice method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/getAllBeacons", method = RequestMethod.POST)
+	public BeaconResponse getAllBeacons(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: getAllBeacons method");
+		BeaconResponse beaconResponse = beaconHandler.findAllBeacons();
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: getAllBeacons method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/beaconLocationMapRequest", method = RequestMethod.POST)
+	public Response beaconLocationMapRequest(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconLocationRequest mapRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: beaconLocationMapRequest method");
+		Response resp = beaconHandler.createBeaconLocation(mapRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: beaconLocationMapRequest method");
+		return resp;
+	}
+
+	@RequestMapping(value = "/searchBeaconLocationMapRequest", method = RequestMethod.POST)
+	public Response searchBeaconLocationMapRequest(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconLocationRequest searchRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: searchBeaconLocationMapRequest method");
+		Response resp = beaconHandler.searchBeaconLocationMapRequest(searchRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: searchBeaconLocationMapRequest method");
+		return resp;
+	}
+
+/*	@RequestMapping(value = "/getBeaconLocationMapRequestDtls", method = RequestMethod.POST)
+	public BeaconLocationRequest getBeaconLocationMapRequestDtls(
+			HttpServletRequest request, HttpServletResponse response,
+			HttpSession session, @RequestBody BeaconLocationRequest searchRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: getBeaconLocationMapRequestDtls method");
+		BeaconLocationRequest beaconLocationMapRequest = beaconHandler.getBeaconLocationMapRequestDtls(searchRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: getBeaconLocationMapRequestDtls method");
+		return beaconLocationMapRequest;
+	}*/
+
+	/*
+	 * @RequestMapping(value = "/beaconLocationUpdateMapRequest", method =
+	 * RequestMethod.POST) public Response
+	 * beaconLocationUpdateMapRequest(HttpServletRequest request,
+	 * HttpServletResponse response, HttpSession session,@RequestBody
+	 * BeaconLocationMapRequest mapRequest) {
+	 * 
+	 * logger.info(
+	 * "Entering :: RestController :: RestBeaconManagementServiceImpl :: beaconLocationMapRequest method"
+	 * ); Response resp = beaconHandler.beaconLocationMapRequest(mapRequest);
+	 * logger.info(
+	 * "Exiting :: RestController :: RestBeaconManagementServiceImpl :: beaconLocationMapRequest method"
+	 * ); return resp; }
+	 */
+
+/*	@RequestMapping(value = "/beaconZoneMapRequest", method = RequestMethod.POST)
+	public Response beaconZoneMapRequest(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconZoneMapRequest mapRequest) {
+
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: beaconZoneMapRequest method");
+		Response resp = beaconHandler.beaconZoneMapRequest(mapRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: beaconZoneMapRequest method");
+		return resp;
+	}*/
+
+	@RequestMapping(value = "/getBeaconsList", method = RequestMethod.POST)
+	public Response getBeaconsList(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: getBeaconsList method");
+		Response resp = beaconHandler.getBeaconsList();
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: getBeaconsList method");
+		return resp;
+	}
+
+	@RequestMapping(value = "/getLocationsList", method = RequestMethod.POST)
+	public Response getLocationsList(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: getLocationsList method");
+		Response resp = beaconHandler.getLocationsList();
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: getLocationsList method");
+		return resp;
+	}
+
+/*	@RequestMapping(value = "/getZonesList", method = RequestMethod.POST)
+	public Response getZonesList(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: getZonesList method");
+		Response resp = beaconHandler.getZonesList();
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: getZonesList method");
+		return resp;
+	}*/
+
+	@RequestMapping(value = "/getBeaconZoneMapDisplayList", method = RequestMethod.POST)
+	public Response getBeaconZoneMapDisplayList(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconZoneMapRequest searchRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: getBeaconZoneMapDisplayList method");
+		Response resp = beaconHandler.getBeaconZoneMapDisplayList(searchRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: getBeaconZoneMapDisplayList method");
+		return resp;
+	}
+
+}

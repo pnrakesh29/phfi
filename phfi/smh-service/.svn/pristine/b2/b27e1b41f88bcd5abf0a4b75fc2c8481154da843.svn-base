@@ -1,0 +1,39 @@
+package com.chatak.beacon.rest.service;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.Response;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:23:23 AM
+ * @version 1.0
+ */
+public interface RestBeaconService {
+
+	public Response registerBeaconDevice(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			BeaconRequest beaconRequest);
+
+	public Response searchBeaconProfiles(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			BeaconRequest beaconRequest);
+
+	public Response findBeaconProfileDetails(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			BeaconRequest beaconRequest);
+
+	public Response deleteBeaconProfile(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, Long beaconId);
+	
+	public Response changeStatus(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			BeaconRequest beaconRequest);
+
+	
+}

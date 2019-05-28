@@ -1,0 +1,135 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
+* << Add Comments Here >>
+* 
+* @author Girmiti Software
+* @date 16-Nov-2015 05:19:51 PM
+* @version 1.0
+*/
+@Entity
+@Table(name = "BEACON_LOCATION_MAP")
+public class BeaconLocationMap implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8211515788484585808L;
+	
+
+	  @Id
+	  @SequenceGenerator(name = "seq_beacon_location_map_id", sequenceName = "SEQ_BEACON_LOCATION_MAP")
+	  @GeneratedValue(generator = "seq_beacon_location_map_id")
+	  @Column(name = "ID")
+	  private Long id;
+	  
+	  @Column(name = "BEACON_ID")
+	  private Long beaconId;
+
+	  @Column(name = "LOCATION_ID")
+	  private String locationId;
+	  
+	  @Column(name = "LOCATION_NAME")
+	  private String locName;
+
+	  @Column(name = "ADDRESS1")
+	  private String addr1;
+
+	  @Column(name = "ADDRESS2")
+	  private String addr2;
+	 
+	  @Column(name = "STATE")
+	  private String state;
+
+	  @Column(name = "CITY")
+	  private String city;
+
+	  @Column(name = "COUNTRY")
+	  private String country;
+	  
+	  @Column(name = "ZIP")
+	  private String zip;
+
+	public Long getBeaconId() {
+		return beaconId;
+	}
+
+	public void setBeaconId(Long beaconId) {
+		this.beaconId = beaconId;
+	}
+
+	public String getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+
+	public String getLocName() {
+		return locName;
+	}
+
+	public void setLocName(String locName) {
+		this.locName = locName;
+	}
+
+	public String getAddr1() {
+		return addr1;
+	}
+
+	public void setAddr1(String addr1) {
+		this.addr1 = addr1;
+	}
+
+	public String getAddr2() {
+		return addr2;
+	}
+
+	public void setAddr2(String addr2) {
+		this.addr2 = addr2;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getZip() {
+		return zip;
+	}
+
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
+
+	  
+}

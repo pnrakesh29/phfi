@@ -1,0 +1,206 @@
+package com.chatak.beacon.handler.impl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.BeaconDao;
+import com.chatak.beacon.dao.model.Beacon;
+import com.chatak.beacon.handler.BeaconHandler;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:50:23 AM
+ * @version 1.0
+ */
+
+@Service("beaconHandler")
+public class BeaconHandlerImpl implements BeaconHandler {
+
+	private static Logger logger = Logger.getLogger(BeaconHandlerImpl.class);
+
+	@Autowired
+	private BeaconDao beaconDao;
+
+	@Override
+	public Response createOrUpdateBeacon(BeaconRequest beaconRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: createOrUpdateBeacon method");
+		Response response = new Response();
+		try {
+			List<Beacon> beacons = beaconDao.findByBeaconName(beaconRequest.getBeaconName().trim());
+			if (StringUtil.isListNotNullNEmpty(beacons)) {
+				response.setResponseCode(ErrorCode.ERROR_CODE_62);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_62));
+				return response;
+			}
+			
+			if(StringUtil.isListNullNEmpty(beacons)){
+				response.setResponseCode(ErrorCode.ERROR_CODE_14);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_14));
+			    return response;
+			}
+
+			Beacon beacon = CommonUtil.copyBeanProperties(beaconRequest,
+					Beacon.class);
+			beacon.setStatus(Constant.ACTIVE);
+			beacon.setCreatedBy(Constant.CREATED_BY);
+			beacon.setCreatedDate(DateUtil.getCurrentTimestamp());
+			beacon.setUpdatedBy(Constant.CREATED_BY);
+			beacon.setUpdatedDate(DateUtil.getCurrentTimestamp());
+			beaconDao.createOrUpdateBeacon(beacon);
+			response.setResponseCode(ErrorCode.SUCCESS);
+			response.setResponseMessage(Properties
+					.getProperty(ErrorCode.SUCCESS));
+		} catch (Exception e) {
+			logger.error(
+					"Error :: BeaconHandlerImpl :: createOrUpdateBeacon method",
+					e);
+			response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+			response.setResponseMessage(Properties
+					.getProperty(ErrorCode.SYSTEM_ERROR));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: createOrUpdateBeacon method");
+
+		return response;
+	}
+	
+	@Override
+	public BeaconResponse searchBeaconProfiles(BeaconRequest beaconRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: searchBeaconProfiles method");
+		BeaconResponse response = new BeaconResponse();
+		List<BeaconRequest> responseList = null;
+		try {
+			List<BeaconRequest> beacons = beaconDao.searchBeaconProfile(beaconRequest);
+			responseList = CommonUtil.copyListBeanProperty(beacons,
+					BeaconRequest.class);
+			response.setBeaconRequests(responseList);
+			response.setNoOfRecords(beacons.size());
+			response.setResponseCode(ErrorCode.SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response
+					.getResponseCode()));
+		} catch (Exception e) {
+			response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+			response.setResponseMessage(Properties
+					.getProperty(ErrorCode.SYSTEM_ERROR));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: searchBeaconProfiles method");
+
+		return response;
+	}
+
+	@Override
+	public BeaconResponse findBeaconProfileDetails(BeaconRequest beaconRequest) {
+		logger.info("Entering :: BeaconHandlerImpl :: findBeaconProfileDetails method");
+		BeaconResponse response = new BeaconResponse();
+		List<BeaconRequest> responseList = new ArrayList<BeaconRequest>();
+		try {
+			Beacon beaconProfile = beaconDao.findById(beaconRequest.getId());
+			if (beaconProfile == null) {
+				response.setResponseCode("");
+				response.setResponseMessage("");
+				return response;
+			}
+			BeaconRequest request = CommonUtil.copyBeanProperties(
+					beaconProfile, BeaconRequest.class);
+			responseList.add(request);
+			response.setBeaconRequests(responseList);
+			response.setResponseCode(ErrorCode.SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response
+					.getResponseCode()));
+		} catch (Exception e) {
+			logger.error(
+					"Error :: BeaconHandlerImpl :: findBeaconProfileDetails method",
+					e);
+			response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response
+					.getResponseCode()));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: findBeaconProfileDetails method");
+
+		return response;
+	}
+
+	@Override
+	public Response deleteBeaconProfile(Long id) {
+
+		Response response = new Response();
+		logger.info("Entering :: BeaconHandlerImpl :: deleteBeaconProfile method");
+		try {
+			Beacon beaconProfile = beaconDao.findById(id);
+			BeaconRequest beaconRequest = CommonUtil.copyBeanProperties(
+					beaconProfile, BeaconRequest.class);
+			if (beaconRequest.getStatus().equals(Constant.ACTIVE)) {
+				beaconProfile.setStatus(Constant.DELETED);
+				beaconProfile.setUpdatedDate(new Timestamp(System
+						.currentTimeMillis()));
+				beaconDao.createOrUpdateBeacon(beaconProfile);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(
+						ErrorCode.ERROR_CODE_00));
+			} else {
+				response.setResponseCode(ErrorCode.ERROR_CODE_99);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(
+						ErrorCode.ERROR_CODE_99));
+			}
+		} catch (Exception e) {
+			logger.error(
+					"Error :: BeaconHandlerImpl :: deleteBeaconProfile method",
+					e);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(
+					ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: deleteBeaconProfile method");
+		return response;
+
+	}
+
+	@Override
+	public Response changeStatus(BeaconRequest beaconRequest) {
+
+		Response response = new Response();
+		logger.info("Entering :: BeaconHandlerImpl :: changeStatus method");
+		try {
+			Beacon beaconProfile = beaconDao.findById(beaconRequest.getId());
+			BeaconRequest beaconRequestProfile = CommonUtil.copyBeanProperties(
+					beaconProfile, BeaconRequest.class);
+			if (beaconRequestProfile != null) {
+				beaconProfile.setStatus(beaconRequest.getStatus());
+				beaconProfile.setReason(beaconRequest.getReason());
+				beaconProfile.setUpdatedDate(new Timestamp(System
+						.currentTimeMillis()));
+				beaconDao.createOrUpdateBeacon(beaconProfile);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(
+						ErrorCode.ERROR_CODE_00));
+			} else {
+				response.setResponseCode(ErrorCode.ERROR_CODE_99);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(
+						ErrorCode.ERROR_CODE_99));
+			}
+		} catch (Exception e) {
+			logger.error("Error :: BeaconHandlerImpl :: changeStatus method", e);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(
+					ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: BeaconHandlerImpl :: changeStatus method");
+		return response;
+	}
+
+}

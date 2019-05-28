@@ -1,0 +1,14 @@
+package com.chatak.beacon.dao;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.UserRoleFeatureMap;
+
+public interface UserRoleFeatureMapDao {
+
+	public UserRoleFeatureMap saveOrUpdateUserRoleFeatureMap(UserRoleFeatureMap featureMap)  throws DataAccessException;
+	
+	public void deleteUserRoleFeatureMap(Long roleId)  throws DataAccessException;
+	
+	
+}

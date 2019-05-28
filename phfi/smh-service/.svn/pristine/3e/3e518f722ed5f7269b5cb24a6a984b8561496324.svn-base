@@ -1,0 +1,6 @@
+00 = Success
+99 =  System Error
+200 = Zone Created Successfully
+201 = Zone Updated Successfully
+202 = Zone Not Found.
+203 = Zone Is Not Active

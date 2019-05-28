@@ -1,0 +1,90 @@
+package com.chatak.beacon.model;
+
+
+
+import com.chatak.beacon.util.CommonUtil;
+
+public class BeaconRequest extends Request{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8647837726586541323L;
+	
+	private Long id;
+	private String beaconId;
+	private String beaconName;
+	private String beaconDesc;
+	private String manufacturer;
+	private String model;
+	private String make;
+	private String expDate;
+	private String status;
+	
+	public String validate() {
+		String message = "";
+
+		if(CommonUtil.isNullAndEmpty(beaconId)) {
+	      message += "Beacon Id is the Required field";
+		}
+		return message;
+	}
+	
+	public String getBeaconId() {
+		return beaconId;
+	}
+	public void setBeaconId(String beaconId) {
+		this.beaconId = beaconId;
+	}
+	public String getBeaconName() {
+		return beaconName;
+	}
+	public void setBeaconName(String beaconName) {
+		this.beaconName = beaconName;
+	}
+	public String getBeaconDesc() {
+		return beaconDesc;
+	}
+	public void setBeaconDesc(String beaconDesc) {
+		this.beaconDesc = beaconDesc;
+	}
+	public String getManufacturer() {
+		return manufacturer;
+	}
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+	public String getModel() {
+		return model;
+	}
+	public void setModel(String model) {
+		this.model = model;
+	}
+	public String getMake() {
+		return make;
+	}
+	public void setMake(String make) {
+		this.make = make;
+	}
+	public String getExpDate() {
+		return expDate;
+	}
+	public void setExpDate(String expDate) {
+		this.expDate = expDate;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+}

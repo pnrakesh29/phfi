@@ -1,0 +1,424 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.AdminUserDao;
+import com.chatak.beacon.dao.model.AdminUser;
+import com.chatak.beacon.dao.model.QAdminUser;
+import com.chatak.beacon.dao.model.QUserRole;
+import com.chatak.beacon.dao.model.QUserRoleEntityMap;
+import com.chatak.beacon.dao.repository.AdminUserRepository;
+import com.chatak.beacon.enums.RoleLevel;
+import com.chatak.beacon.model.AdminUserRequest;
+import com.chatak.beacon.util.StringUtil;
+import com.mysema.query.Tuple;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.OrderSpecifier;
+import com.mysema.query.types.expr.BooleanExpression;
+
+/**
+ *
+ * << Add Comments Here >>
+ *
+ * @author Girmiti Software
+ * @date 25-Apr-2015 3:27:50 PM
+ * @version 1.0
+ */
+@Repository("adminUserDao")
+public class AdminUserDaoImpl implements AdminUserDao {
+  
+  @Autowired
+  private AdminUserRepository adminUserRepository;
+
+  @PersistenceContext
+  private EntityManager entityManager;
+  
+  @Override
+  public AdminUser authenticateChatakAdminUser(String spUName) throws DataAccessException {
+    try {
+      List<AdminUser> adminUsers = adminUserRepository.findByUserName(spUName);
+      if (null != adminUsers && !adminUsers.isEmpty()) {
+          return adminUsers.get(0);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  @Override
+  public boolean authenticateChatakAdmin(String email, String spPass) throws DataAccessException {
+    // TODO Auto-generated method stub
+    return false;
+  }
+  
+  @Override
+ 	public AdminUser saveOrUpdateAdminUser(AdminUser adminUserDetails) throws DataAccessException {
+ 		return adminUserRepository.save(adminUserDetails);
+ 	}
+  
+  @Override
+	public List<AdminUser> findByUserName(String userName)	throws DataAccessException {
+		return adminUserRepository.findByUserName(userName);
+	}
+
+  @Override
+  public AdminUser findByAdminUserId(Long adminUserId)throws DataAccessException {
+	return adminUserRepository.findOne(adminUserId);
+  }
+  
+  @Override
+	public List<AdminUser> findByUserEmailId(String email)	throws DataAccessException {
+		return adminUserRepository.findByEmail(email);
+	}
+  
+  @Override
+	public List<AdminUser> findByAdminUserLoginNameOrEmail(String userName, String email) throws DataAccessException {
+		return adminUserRepository.findByUserNameOrEmail(userName, email);
+	}
+
+  /*@Override
+	public List<AdminUserRequest> searchAdminUser(AdminUserRequest adminUserRequestTemp)
+			throws Exception {
+		List<AdminUserRequest> userRequestList = new ArrayList<AdminUserRequest>();
+		int offset = 0;
+		int limit = 0;
+		Integer totalRecords = adminUserRequestTemp.getNoOfRecords();
+
+		if (adminUserRequestTemp.getPageIndex() == null
+				|| adminUserRequestTemp.getPageIndex() == 1) {
+			totalRecords = getTotalNumberOfRecords(adminUserRequestTemp);
+			adminUserRequestTemp.setNoOfRecords(totalRecords);
+		}
+
+		if (adminUserRequestTemp.getPageIndex() == null
+				&& adminUserRequestTemp.getPageSize() == null) {
+			offset = 0;
+			limit = Constant.DEFAULT_PAGE_SIZE;
+		} else {
+			offset = (adminUserRequestTemp.getPageIndex() - 1)
+					* adminUserRequestTemp.getPageSize();
+			limit = adminUserRequestTemp.getPageSize();
+		}
+		JPAQuery query = new JPAQuery(entityManager);
+		List<Tuple> tupleList = query
+				.from(QAdminUser.adminUser,QUserRole.userRole,QUserRoleEntityMap.userRoleEntityMap)
+				.where(isRoleId(adminUserRequestTemp.getUserRoleId()),
+						    isUserNameLike(adminUserRequestTemp.getUserName()),
+							isEmailId(adminUserRequestTemp.getEmail()),
+							isStatus(adminUserRequestTemp.getStatus()),
+							isEntityIdIn(adminUserRequestTemp.getEntityId(),adminUserRequestTemp.getRoleLevelList()),
+							isRoleIdIn(adminUserRequestTemp.getUserRoleId(),adminUserRequestTemp.getRoleLevelList()),
+							isUserType(adminUserRequestTemp.getUserType()),
+							isUserTypeIn(adminUserRequestTemp.getUseTypeIn()),
+						QAdminUser.adminUser.userRoleId.eq(QUserRole.userRole.userRoleId),
+						QUserRole.userRole.userRoleId.eq(QUserRoleEntityMap.userRoleEntityMap.userRoleId))
+						.offset(offset)
+						.limit(limit)
+                    .orderBy(orderByUserIDDesc())
+                    .list(QAdminUser.adminUser.adminUserId,
+                  		  QAdminUser.adminUser.userName,
+                  		  QAdminUser.adminUser.userType,
+                  		  QAdminUser.adminUser.email,
+                  		  QAdminUser.adminUser.phone,
+                    		QAdminUser.adminUser.firstName,
+                    		QAdminUser.adminUser.lastName,
+                    		QAdminUser.adminUser.status,
+                    		QAdminUser.adminUser.userRoleId,
+                    		QAdminUser.adminUser.createdBy,
+                    		QUserRole.userRole.status,
+                    		QUserRole.userRole.name);
+		for (Tuple tuple : tupleList) {
+		        
+        AdminUserRequest requestTemp  = new AdminUserRequest();
+        requestTemp.setAdminUserId(tuple.get(QAdminUser.adminUser.adminUserId));
+        requestTemp.setUserName(tuple.get(QAdminUser.adminUser.userName));
+        requestTemp.setUserType(tuple.get(QAdminUser.adminUser.userType));
+        requestTemp.setEmail(tuple.get(QAdminUser.adminUser.email));
+        requestTemp.setPhone(tuple.get(QAdminUser.adminUser.phone));
+        requestTemp.setFirstName(tuple.get(QAdminUser.adminUser.firstName));
+        requestTemp.setLastName(tuple.get(QAdminUser.adminUser.lastName));
+        requestTemp.setStatus(tuple.get(QAdminUser.adminUser.status));
+        requestTemp.setUserRoleId(tuple.get(QAdminUser.adminUser.userRoleId));
+        requestTemp.setRoleName(tuple.get(QUserRole.userRole.name));
+        requestTemp.setRoleLevelList(RoleLevel.valueOf(tuple.get(QAdminUser.adminUser.userType)));
+      //  requestTemp.setPartnerName(tuple.get(QPartner.partner.partnerName));
+        requestTemp.setRoleStatus(tuple.get(QUserRole.userRole.status));
+        requestTemp.setCreatedBy(tuple.get(QAdminUser.adminUser.createdBy));
+        userRequestList.add(requestTemp);
+		}
+		return userRequestList;
+	}
+	private int getTotalNumberOfRecords(AdminUserRequest adminUserRequestTemp) throws Exception {
+		JPAQuery query = new JPAQuery(entityManager);
+		List<Tuple> list = query.from(QAdminUser.adminUser,QUserRole.userRole,QUserRoleEntityMap.userRoleEntityMap)
+				.where(isRoleId(adminUserRequestTemp.getUserRoleId()),
+					//	isUserId(Long.valueOf(adminUserRequestTemp.getUserId())),
+						isUserNameLike(adminUserRequestTemp.getUserName()),
+						isEmailId(adminUserRequestTemp.getEmail()),
+						isStatus(adminUserRequestTemp.getStatus()),
+						isEntityIdIn(adminUserRequestTemp.getEntityId(),adminUserRequestTemp.getRoleLevelList()),
+						isRoleIdIn(adminUserRequestTemp.getUserRoleId(),adminUserRequestTemp.getRoleLevelList()),
+						isUserType(adminUserRequestTemp.getUserType()),
+						isUserTypeIn(adminUserRequestTemp.getUseTypeIn()),
+						QAdminUser.adminUser.userRoleId.eq(QUserRole.userRole.userRoleId),
+						QUserRole.userRole.userRoleId.eq(QUserRoleEntityMap.userRoleEntityMap.userRoleId))
+						.list(QAdminUser.adminUser.adminUserId,
+								QAdminUser.adminUser.userType,
+								QAdminUser.adminUser.email,
+								QAdminUser.adminUser.phone,
+								QAdminUser.adminUser.firstName,
+								QAdminUser.adminUser.lastName);
+		
+		return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+	}*/
+	
+  
+  
+	/*private BooleanExpression isStatus(String status){
+	    return !StringUtil.isNullAndEmpty(status) ? QAdminUser.adminUser.status.eq(status) : null;        
+	}
+	
+	private BooleanExpression isUserTypeIn(List<String> userTpeIn){
+	    return StringUtil.isListNotNullNEmpty(userTpeIn)? QAdminUser.adminUser.userType.in(userTpeIn) : null;        
+	}
+	private BooleanExpression isUserNameLike(String userName) {
+		return (userName != null && !"".equals(userName)) ? QAdminUser.adminUser.userName
+				.toUpperCase().like("%" + userName.toUpperCase().replace("*", "") + "%") : null;
+	}
+	private BooleanExpression isEntityIdIn(Long entityId,RoleLevel roleCategory){
+		if(!StringUtil.isNull(roleCategory) && RoleLevel.TOKEN.equals(roleCategory)){
+			return entityId != null ? QUserRoleEntityMap.userRoleEntityMap.tokenId.eq(entityId) : null;
+		}else if(!StringUtil.isNull(roleCategory) && RoleLevel.SPTSM.equals(roleCategory)){
+			return entityId != null ? QUserRoleEntityMap.userRoleEntityMap.sptsmId.eq(entityId) : null;
+		}else if(!StringUtil.isNull(roleCategory) && RoleLevel.HCE.equals(roleCategory)){
+			return entityId != null ? QUserRoleEntityMap.userRoleEntityMap.hceId.eq(entityId) : null;
+		}
+		return null;
+	}
+	
+	private BooleanExpression isRoleIdIn(Long userId,RoleLevel roleCategory){
+		if(!StringUtil.isNull(roleCategory) && RoleLevel.TOKEN.equals(roleCategory)){
+			return userId != null ? QUserRoleEntityMap.userRoleEntityMap.tokenId.eq(userId) : null;
+		}else if(!StringUtil.isNull(roleCategory) && RoleLevel.SPTSM.equals(roleCategory)){
+			return userId != null ? QUserRoleEntityMap.userRoleEntityMap.sptsmId.eq(userId) : null;
+		}else if(!StringUtil.isNull(roleCategory) && RoleLevel.HCE.equals(roleCategory)){
+			return userId != null ? QUserRoleEntityMap.userRoleEntityMap.hceId.eq(userId) : null;
+		}
+		return null;
+	}
+	
+	private BooleanExpression isUserType(String userType){
+	    return !StringUtil.isNullAndEmpty(userType) ? QAdminUser.adminUser.userType.eq(userType) : null;        
+	}
+	
+	private BooleanExpression isRoleId(Long roleId){
+		return roleId != null ? QAdminUser.adminUser.userRoleId.eq(roleId) : null;
+	}
+	
+	private BooleanExpression isEmailId(String emailId) {
+		return (emailId != null && !"".equals(emailId)) ?  QAdminUser.adminUser.email.toUpperCase().like(emailId.replace("*", "").toUpperCase()) : null;
+	}
+	
+	private OrderSpecifier<Long> orderByUserIDDesc() {
+		return QAdminUser.adminUser.adminUserId.desc();
+	}*/
+  
+  
+  @Override
+	public List<AdminUserRequest> searchAdminUser(AdminUserRequest userTo) throws Exception {
+		Integer pageIndex = userTo.getPageIndex();
+		Integer pageSize = userTo.getPageSize();
+		Integer offset = 0;
+		Integer limit = 0;
+		Integer totalRecords = userTo.getNoOfRecords();
+		List<AdminUserRequest> userRespList = new ArrayList<AdminUserRequest>();
+
+		if (pageIndex == null || pageIndex == 1) {
+			totalRecords = getTotalNumberOfRecords(userTo);
+			userTo.setNoOfRecords(totalRecords);
+		}
+
+		if (pageIndex == null && pageSize == null) {
+			offset = 0;
+			limit = Constant.DEFAULT_PAGE_SIZE;
+		} else {
+			offset = (pageIndex - 1) * pageSize;
+			limit = pageSize;
+		}
+
+		JPAQuery query = new JPAQuery(entityManager);
+		QUserRole userRole = QUserRole.userRole;
+		List<Tuple> dataList = query
+				.from(QAdminUser.adminUser,userRole)
+				.where(isAdminUserIdEq(userTo.getAdminUserId()),
+						isLastNameEq(userTo.getLastName()),
+						isFirstNameEq(userTo.getFirstName()),
+						isUserTypeEq(userTo.getUserType()),
+						isRoleIdEq(userTo.getUserRoleId()),
+						isUserNameEq(userTo.getUserName()),
+						isPhone(userTo.getPhone()),
+						QAdminUser.adminUser.userRoleId.eq(userRole.userRoleId),
+						//isUserStatusEq(userTo.getStatus()),
+						isEmailIdEq(userTo.getEmail()),
+						isCreatedByEq(userTo.getCreatedBy()))
+						//isStatusEq(userTo.getStatus()),
+						//isRoleIdNot(userTo.getUserRoleId()))
+						//isStatusNotEq(userTo.getStatus()),
+//						QAdminUser.adminUser.userRoleId
+//								.eq(QHostUserRoles.hostUserRoles.userRoleId))
+				.offset(offset)
+				.limit(limit)
+				.orderBy(orderByUserIdAsc())
+				.list(QAdminUser.adminUser.adminUserId,
+						QAdminUser.adminUser.firstName,
+						QAdminUser.adminUser.lastName,
+						QAdminUser.adminUser.status,
+						QAdminUser.adminUser.phone,
+						QAdminUser.adminUser.userName,
+						QAdminUser.adminUser.email,
+						QAdminUser.adminUser.userType,
+						userRole.name);
+						//QHostUserRoles.hostUserRoles.roleName);
+		AdminUserRequest adminUserDto = null;
+		for (Tuple data : dataList) {
+			adminUserDto = new AdminUserRequest();
+			adminUserDto.setAdminUserId(data
+					.get(QAdminUser.adminUser.adminUserId));
+			adminUserDto.setPhone(data.get(QAdminUser.adminUser.phone));
+			adminUserDto.setUserName(data.get(QAdminUser.adminUser.userName));
+			adminUserDto.setEmail(data.get(QAdminUser.adminUser.email));
+			adminUserDto.setUserType(data.get(QAdminUser.adminUser.userType));
+			adminUserDto.setFirstName(data.get(QAdminUser.adminUser.firstName));
+			adminUserDto.setLastName(data.get(QAdminUser.adminUser.lastName));
+			adminUserDto.setStatus(data.get(QAdminUser.adminUser.status));
+			adminUserDto.setRoleName(data.get(userRole.name));
+			
+			userRespList.add(adminUserDto);
+		}
+		return userRespList;
+	}
+
+//	private BooleanExpression isRoleIdNot(Long roleId) {
+//		roleId=1L;
+//		return (roleId != null && !"".equals(roleId.toString())) ? QHostAdminUser.hostAdminUser.userRoleId
+//				.ne(roleId) : null;
+//	}
+	
+//	private BooleanExpression isStatusEq(Integer status) {
+//		return (status != null && !"".equals(status.toString())) ? QAdminUser.adminUser.status.eq(status) : null;
+//	}
+//	
+//	private BooleanExpression isStatusNotEq(Integer status) {
+//		status=7;
+//		return (status != null && !"".equals(status.toString())) ? QAdminUser.adminUser.status.ne(status) : null;
+//	}
+	
+	private BooleanExpression isAdminUserIdEq(Long userid) throws Exception {
+
+		return (userid != null && !"".equals(userid)) ? QAdminUser.adminUser.adminUserId
+				.eq(userid) : null;
+	}
+
+	private BooleanExpression isRoleIdEq(Long userRoleId) throws Exception {
+
+		return (userRoleId != null) ?QAdminUser.adminUser.userRoleId
+				.eq(userRoleId) : null;
+	}
+
+	private BooleanExpression isLastNameEq(String lastName) throws Exception {
+
+		return (lastName != null && !"".equals(lastName)) ? QAdminUser.adminUser.lastName
+				.toUpperCase().like(
+						"%" + lastName.toUpperCase().replace("*", "") + "%")
+				: null;
+	}
+
+	private BooleanExpression isFirstNameEq(String firstName) throws Exception {
+
+		return (firstName != null && !"".equals(firstName)) ? QAdminUser.adminUser.firstName
+				.toUpperCase().like(
+						"%" + firstName.toUpperCase().replace("*", "") + "%")
+				: null;
+	}
+
+	private BooleanExpression isUserTypeEq(String userType) throws Exception {
+
+		return (userType != null && !"".equals(userType)) ? QAdminUser.adminUser.userType
+				.equalsIgnoreCase(userType) : null;
+	}
+
+	private BooleanExpression isUserNameEq(String userName) throws Exception {
+
+		return (userName != null && !"".equals(userName)) ? QAdminUser.adminUser.userName
+				.toUpperCase().like(
+						"%" + userName.toUpperCase().replace("*", "") + "%")
+				: null;
+	}
+
+	private BooleanExpression isEmailIdEq(String emailId) throws Exception {
+		return (emailId != null && !"".equals(emailId)) ? QAdminUser.adminUser.email
+				.toUpperCase().like(
+						"%" + emailId.toUpperCase().replace("*", "") + "%")
+				: null;
+	}
+
+	private BooleanExpression isCreatedByEq(String createdBy) throws Exception {
+
+		return (createdBy != null && !"".equals(createdBy)) ? QAdminUser.adminUser.createdBy
+				.equalsIgnoreCase(createdBy) : null;
+	}
+	
+	private BooleanExpression isUserStatusEq(String status) throws Exception {
+
+		return (status != null) ?QAdminUser.adminUser.status.eq(status)
+				: null;
+	}
+
+	private BooleanExpression isPhone(String phone) throws Exception {
+		return (phone != null && !"".equals(phone)) ? QAdminUser.adminUser.phone
+				.toUpperCase().like(
+						"%" + phone.toUpperCase().replace("*", "") + "%")
+				: null;
+	}
+
+	private OrderSpecifier<Long> orderByUserIdAsc() {
+		return QAdminUser.adminUser.adminUserId.desc();
+	}
+
+	private int getTotalNumberOfRecords(AdminUserRequest userTo) throws Exception {
+		JPAQuery query = new JPAQuery(entityManager);
+		List<AdminUser> adminuserList = query
+				.from(QAdminUser.adminUser)
+				.where(isAdminUserIdEq(userTo.getAdminUserId()),
+						isLastNameEq(userTo.getLastName()),
+						isFirstNameEq(userTo.getFirstName()),
+						isUserTypeEq(userTo.getUserType()),
+						isRoleIdEq(userTo.getUserRoleId()),
+						isUserNameEq(userTo.getUserName()),
+						isPhone(userTo.getPhone()),
+						//isUserStatusEq(userTo.getStatus()),
+						isEmailIdEq(userTo.getEmail()),
+						isCreatedByEq(userTo.getCreatedBy()))
+						//isStatusEq(userTo.getStatus()),
+						//isRoleIdNot(userTo.getUserRoleId()))
+						//isStatusNotEq(userTo.getStatus()),
+//						QAdminUser.adminUser.userRoleId
+//								.eq(QHostUserRoles.hostUserRoles.userRoleId))
+				.orderBy(orderByUserIdAsc()).list(QAdminUser.adminUser);
+
+		return (adminuserList != null && !adminuserList.isEmpty() ? adminuserList
+				.size() : 0);
+	}
+  
+  
+}

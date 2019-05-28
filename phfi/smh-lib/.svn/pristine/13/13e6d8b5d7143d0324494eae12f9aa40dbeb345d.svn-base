@@ -1,0 +1,25 @@
+package com.chatak.beacon.enums;
+
+public enum RoleLevel {
+	
+	SYSTEM("System Role"),
+	TOKEN("Token Role"),
+	HCE("HCE Role"),
+	SPTSM("SPTSM Role"),
+	SUPER_ADMIN("Super_Admin");
+	
+	private String value;
+	 
+	private RoleLevel(){
+	}
+	
+    private RoleLevel(String s){
+		this.value=s;
+		
+	}
+    
+	public String getValue(){
+		return value;
+	}
+
+}

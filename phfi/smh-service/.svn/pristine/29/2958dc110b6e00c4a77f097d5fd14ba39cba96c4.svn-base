@@ -1,0 +1,305 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 12:19:51 PM
+ * @version 1.0
+ */
+@Entity
+@Table(name = "BEACON")
+public class Beacon implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2707000283124940266L;
+
+	@Id
+	@SequenceGenerator(name = "SEQ_BEACON_ID", sequenceName = "SEQ_BEACON")
+	@GeneratedValue(generator = "SEQ_BEACON_ID")
+	@Column(name = "ID")
+	private Long id;
+
+	@Column(name = "UUID")
+	private String uuid;
+	
+	@Column(name = "ZONE_ID")
+	private Long zoneId;
+
+	@Column(name = "BEACON_NAME")
+	private String beaconName;
+
+	@Column(name = "COLOR")
+	private String color;
+
+	@Column(name = "MAJOR")
+	private String major;
+
+	@Column(name = "MINOR")
+	private String minor;
+
+	@Column(name = "TRANSMIT_POWER")
+	private Double transmitPower;
+
+	@Column(name = "MAC_ADDRESS")
+	private String macAddress;
+
+	@Column(name = "ADVERTISING_INTERVAL")
+	private Long advertisingInterval;
+
+	@Column(name = "STATUS")
+	private String status;
+	
+	@Column(name = "REASON")
+	private String reason;
+
+	@Column(name = "created_date")
+	private Timestamp createdDate;
+
+	@Column(name = "created_by")
+	private String createdBy;
+
+	@Column(name = "updated_date")
+	private Timestamp updatedDate;
+
+	@Column(name = "updated_by")
+	private String updatedBy;
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the uuid
+	 */
+	public String getUuid() {
+		return uuid;
+	}
+
+	/**
+	 * @param uuid the uuid to set
+	 */
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	/**
+	 * @return the zoneId
+	 */
+	public Long getZoneId() {
+		return zoneId;
+	}
+
+	/**
+	 * @param zoneId the zoneId to set
+	 */
+	public void setZoneId(Long zoneId) {
+		this.zoneId = zoneId;
+	}
+
+	/**
+	 * @return the beaconName
+	 */
+	public String getBeaconName() {
+		return beaconName;
+	}
+
+	/**
+	 * @param beaconName the beaconName to set
+	 */
+	public void setBeaconName(String beaconName) {
+		this.beaconName = beaconName;
+	}
+
+	/**
+	 * @return the color
+	 */
+	public String getColor() {
+		return color;
+	}
+
+	/**
+	 * @param color the color to set
+	 */
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	/**
+	 * @return the major
+	 */
+	public String getMajor() {
+		return major;
+	}
+
+	/**
+	 * @param major the major to set
+	 */
+	public void setMajor(String major) {
+		this.major = major;
+	}
+
+	/**
+	 * @return the minor
+	 */
+	public String getMinor() {
+		return minor;
+	}
+
+	/**
+	 * @param minor the minor to set
+	 */
+	public void setMinor(String minor) {
+		this.minor = minor;
+	}
+
+	/**
+	 * @return the transmitPower
+	 */
+	public Double getTransmitPower() {
+		return transmitPower;
+	}
+
+	/**
+	 * @param transmitPower the transmitPower to set
+	 */
+	public void setTransmitPower(Double transmitPower) {
+		this.transmitPower = transmitPower;
+	}
+
+	/**
+	 * @return the macAddress
+	 */
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	/**
+	 * @param macAddress the macAddress to set
+	 */
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
+	}
+
+	/**
+	 * @return the advertisingInterval
+	 */
+	public Long getAdvertisingInterval() {
+		return advertisingInterval;
+	}
+
+	/**
+	 * @param advertisingInterval the advertisingInterval to set
+	 */
+	public void setAdvertisingInterval(Long advertisingInterval) {
+		this.advertisingInterval = advertisingInterval;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the createdDate
+	 */
+	public Timestamp getCreatedDate() {
+		return createdDate;
+	}
+
+	/**
+	 * @param createdDate the createdDate to set
+	 */
+	public void setCreatedDate(Timestamp createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	/**
+	 * @return the createdBy
+	 */
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	/**
+	 * @param createdBy the createdBy to set
+	 */
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	/**
+	 * @return the updatedDate
+	 */
+	public Timestamp getUpdatedDate() {
+		return updatedDate;
+	}
+
+	/**
+	 * @param updatedDate the updatedDate to set
+	 */
+	public void setUpdatedDate(Timestamp updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
+	/**
+	 * @return the updatedBy
+	 */
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	/**
+	 * @param updatedBy the updatedBy to set
+	 */
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	/**
+	 * @return the reason
+	 */
+	public String getReason() {
+		return reason;
+	}
+
+	/**
+	 * @param reason the reason to set
+	 */
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+	
+	
+}

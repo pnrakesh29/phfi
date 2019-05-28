@@ -1,0 +1,210 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 05:19:51 PM
+ * @version 1.0
+ */
+@Entity
+@Table(name = "BEACON_LOCATION")
+public class BeaconLocation implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8211515788484585808L;
+
+	@Id
+	@SequenceGenerator(name = "seq_beacon_location_id", sequenceName = "SEQ_BEACON_LOCATION")
+	@GeneratedValue(generator = "seq_beacon_location_id")
+	@Column(name = "ID")
+	private Long id;
+
+	@Column(name = "BEACON_ID")
+	private Long beaconId;
+
+	@Column(name = "LOCATION_ID")
+	private String locationId;
+
+	@Column(name = "LOCATION_NAME")
+	private String locName;
+
+	@Column(name = "ADDRESS1")
+	private String address1;
+
+	@Column(name = "ADDRESS2")
+	private String address2;
+
+	@Column(name = "STATE")
+	private String state;
+
+	@Column(name = "CITY")
+	private String city;
+
+	@Column(name = "COUNTRY")
+	private String country;
+
+	@Column(name = "ZIP")
+	private String zip;
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the beaconId
+	 */
+	public Long getBeaconId() {
+		return beaconId;
+	}
+
+	/**
+	 * @param beaconId
+	 *            the beaconId to set
+	 */
+	public void setBeaconId(Long beaconId) {
+		this.beaconId = beaconId;
+	}
+
+	/**
+	 * @return the locationId
+	 */
+	public String getLocationId() {
+		return locationId;
+	}
+
+	/**
+	 * @param locationId
+	 *            the locationId to set
+	 */
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+
+	/**
+	 * @return the locName
+	 */
+	public String getLocName() {
+		return locName;
+	}
+
+	/**
+	 * @param locName
+	 *            the locName to set
+	 */
+	public void setLocName(String locName) {
+		this.locName = locName;
+	}
+
+	/**
+	 * @return the addr1
+	 */
+	public String getAddr1() {
+		return address1;
+	}
+
+	/**
+	 * @param addr1
+	 *            the addr1 to set
+	 */
+	public void setAddr1(String addr1) {
+		this.address1 = addr1;
+	}
+
+	/**
+	 * @return the addr2
+	 */
+	public String getAddr2() {
+		return address2;
+	}
+
+	/**
+	 * @param addr2
+	 *            the addr2 to set
+	 */
+	public void setAddr2(String addr2) {
+		this.address2 = addr2;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public String getState() {
+		return state;
+	}
+
+	/**
+	 * @param state
+	 *            the state to set
+	 */
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	/**
+	 * @return the city
+	 */
+	public String getCity() {
+		return city;
+	}
+
+	/**
+	 * @param city
+	 *            the city to set
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * @return the country
+	 */
+	public String getCountry() {
+		return country;
+	}
+
+	/**
+	 * @param country
+	 *            the country to set
+	 */
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	/**
+	 * @return the zip
+	 */
+	public String getZip() {
+		return zip;
+	}
+
+	/**
+	 * @param zip
+	 *            the zip to set
+	 */
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
+}

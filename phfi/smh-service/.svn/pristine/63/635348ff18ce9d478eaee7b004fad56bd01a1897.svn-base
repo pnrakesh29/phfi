@@ -1,0 +1,265 @@
+package com.chatak.beacon.handler.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.BeaconErrorCodes;
+import com.chatak.beacon.dao.LocationDao;
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.handler.LocationHandler;
+import com.chatak.beacon.model.ChangeStatusRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.LocationResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 19-Nov-2015 1:03:41 PM
+ * @version 1.0
+ */
+@Service("locationHandler")
+public class LocationHandlerImpl implements LocationHandler {
+
+	private static Logger logger = Logger.getLogger(LocationHandlerImpl.class);
+	
+	@Autowired
+	private LocationDao locationDao;
+	
+	@Override
+	public Response createLocation(LocationRequest locationRequest) {
+		logger.info("Entering :: LocationHandlerImpl :: createLocation method");
+		Response response = new Response();
+		try{
+			List<Location> locations = locationDao.findByLocationName(locationRequest.getLocationName().trim());
+				if(StringUtil.isListNotNullNEmpty(locations)){
+					response.setResponseCode(BeaconErrorCodes.LOCATION_ALREADY_EXIST);
+					response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				    return response;
+				}
+				Location location = CommonUtil.copyBeanProperties(locationRequest, Location.class);
+				location.setStatus(Constant.ACTIVE);
+				location.setCreatedBy(Constant.CREATED_BY);
+				location.setCreatedDate(DateUtil.getCurrentTimestamp());
+				location.setUpdatedBy(Constant.CREATED_BY);
+				location.setUpdatedDate(DateUtil.getCurrentTimestamp());
+				locationDao.createOrUpdateLocation(location);
+				response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: createLocation method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: createLocation method");
+		
+		return response;
+	}
+
+	@Override
+	public Response updateLocation(LocationRequest locationRequest) {
+		logger.info("Entering :: LocationHandlerImpl :: updateLocation method");
+		Response response = new Response();
+		try {
+			Location locationFromDB = locationDao.findById(locationRequest.getId());
+			if (StringUtil.isNull(locationFromDB)) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_ALREADY_EXIST);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			
+			if (!Constant.ACTIVE.equalsIgnoreCase(locationFromDB.getStatus())) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			List<Location> locationList = locationDao.findByLocationName(locationRequest.getLocationName());
+			Boolean locationNameExists = Boolean.FALSE;
+			if(StringUtil.isListNotNullNEmpty(locationList)){
+				for(Location location : locationList){
+					if (location.getId().compareTo(locationFromDB.getId()) != 0) {
+						locationNameExists = Boolean.TRUE;
+						break;
+					}
+				}
+			}
+			if (locationNameExists) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_ALREADY_EXIST);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			Location location = CommonUtil.copyBeanProperties(locationRequest, Location.class);
+			location.setUpdatedBy(Constant.CREATED_BY);
+			location.setUpdatedDate(DateUtil.getCurrentTimestamp());
+			locationDao.createOrUpdateLocation(location);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: updateLocation method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: updateLocation method");
+		return response;
+	}
+
+	@Override
+	public LocationResponse searchLocation(LocationRequest locationRequest) {
+		logger.info("Entering :: LocationHandlerImpl :: searchLocation method");
+		LocationResponse response = new LocationResponse();
+		try{
+			List<LocationRequest> locationRequests = locationDao.searchLocation(locationRequest);
+			response.setLocationRequests(locationRequests);
+			response.setNoOfRecords(locationRequest.getNoOfRecords());
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: searchLocation method");
+		
+		return response;
+	}
+
+	@Override
+	public LocationResponse findLocationById(Long id) {
+		logger.info("Entering :: LocationHandlerImpl :: findLocationById method");
+		LocationResponse response = new LocationResponse();
+		List<LocationRequest> responseList = new ArrayList<LocationRequest>();
+		try{
+			Location accountProfile = locationDao.findById(id);
+			if(accountProfile == null) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_FOUND);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			LocationRequest locationRequest = CommonUtil.copyBeanProperties(accountProfile, LocationRequest.class);
+			responseList.add(locationRequest);
+			response.setLocationRequests(responseList);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: findLocationById method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: findLocationById method");
+		
+		return response;
+	}
+
+	@Override
+	public LocationResponse deleteLocation(Long id) {
+		logger.info("Entering :: LocationHandlerImpl :: deleteLocation method");
+		LocationResponse response = new LocationResponse();
+		try {
+			Location location = locationDao.findById(id);
+			LocationRequest locationRequest = CommonUtil.copyBeanProperties(location, LocationRequest.class);
+			if (!Constant.ACTIVE.equals(locationRequest.getStatus())) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			} else {
+				location.setStatus(Constant.DELETED);
+				location.setUpdatedBy(Constant.CREATED_BY);
+				location.setUpdatedDate(DateUtil.getCurrentTimestamp());
+				locationDao.createOrUpdateLocation(location);
+				response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			}
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: deleteLocation method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: deleteLocation method");
+		return response;
+	}
+
+	@Override
+	public LocationResponse changeStatus(ChangeStatusRequest changeStatusRequest) {
+		logger.info("Entering :: LocationHandlerImpl :: changeStatus method");
+		LocationResponse response = new LocationResponse();
+		try {
+			Location location = locationDao.findById(changeStatusRequest.getId());
+			if (location == null) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_FOUND);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			} else {
+				location.setStatus(changeStatusRequest.getStatus());
+				location.setReason(changeStatusRequest.getReason());
+				location.setUpdatedBy(Constant.CREATED_BY);
+				location.setUpdatedDate(DateUtil.getCurrentTimestamp());
+				locationDao.createOrUpdateLocation(location);
+				response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			}
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: changeStatus method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: changeStatus method");
+		return response;
+	}
+
+	@Override
+	public LocationResponse getAllActiveLocations() {
+		logger.info("Entering :: LocationHandlerImpl :: getAllActiveLocations method");
+		LocationResponse response = new LocationResponse();
+		try{
+			List<LocationRequest> locations = locationDao.getAllActiveLocations();
+			if(StringUtil.isListNullNEmpty(locations)) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_FOUND);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+		//	List<LocationRequest> locationRequests = CommonUtil.copyBeanProperties(locations, LocationRequest.class);
+			response.setLocationRequests(locations);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: getAllActiveLocations method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: getAllActiveLocations method");
+		
+		return response;
+	}
+
+	@Override
+	public LocationResponse getAllLocations() {
+		logger.info("Entering :: LocationHandlerImpl :: getAllActiveLocations method");
+		LocationResponse response = new LocationResponse();
+		try{
+			List<Location> locations = locationDao.getAllLocations();
+			if(StringUtil.isListNullNEmpty(locations)) {
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_FOUND);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			List<LocationRequest> locationRequests = CommonUtil.copyBeanProperties(locations, LocationRequest.class);
+			response.setLocationRequests(locationRequests);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: LocationHandlerImpl :: getAllLocations method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: LocationHandlerImpl :: getAllLocations method");
+		
+		return response;
+	}
+}

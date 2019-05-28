@@ -1,0 +1,80 @@
+package com.chatak.beacon.rest.service.impl;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.chatak.beacon.handler.ZoneServiceHandler;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneManagementRequest;
+import com.chatak.beacon.model.ZoneManagementResponse;
+import com.chatak.beacon.rest.service.RestZoneManagementService;
+
+
+@RestController
+@RequestMapping(value = "/zoneService", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestZoneManagementServiceImpl implements RestZoneManagementService{
+	
+	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	@Autowired
+	private ZoneServiceHandler zoneServiceHandler;
+	
+	@Override
+	@RequestMapping(value = "/createOrUpdateZone", method = RequestMethod.POST)
+	public Response createOrUpdateZone(HttpServletRequest request,
+											 HttpServletResponse response,
+											 HttpSession session,
+											 @RequestBody ZoneManagementRequest zoneManagementRequest) {
+		logger.info("Entering:: RestZoneManagementServiceImpl:: createOrUpdateZone method");
+		Response responseData = zoneServiceHandler.createOrUpdateZone(zoneManagementRequest);
+		logger.info("Exiting:: RestZoneManagementServiceImpl:: createOrUpdateZone method");
+		return responseData;
+	}
+
+	@Override
+	@RequestMapping(value = "/searchZone", method = RequestMethod.POST)
+	public Response searchZone(HttpServletRequest request,
+							   HttpServletResponse response,
+							   HttpSession session,
+							   @RequestBody ZoneManagementRequest zoneManagementRequest) {
+		logger.info("Entering:: RestZoneManagementServiceImpl:: searchZone method");
+		Response responseData = zoneServiceHandler.searchZone(zoneManagementRequest);
+		logger.info("Exiting:: RestZoneManagementServiceImpl:: searchZone method");
+		return responseData;
+	}
+
+	@Override
+	@RequestMapping(value = "/findZoneDetails", method = RequestMethod.POST)
+	public ZoneManagementResponse findZoneDetails(HttpServletRequest request,
+												  HttpServletResponse response,
+												  HttpSession session,
+											  	  @RequestBody ZoneManagementRequest zoneManagementRequest) {
+		logger.info("Entering :: RestZoneManagementServiceImpl :: findZoneDetails  method");
+		ZoneManagementResponse zoneManagementResponse = zoneServiceHandler.findZoneDetails(zoneManagementRequest);
+	    logger.info("Exiting :: RestZoneManagementServiceImpl :: findZoneDetails method");
+	    return zoneManagementResponse;
+	}
+
+	@Override
+	@RequestMapping(value = "/deleteZone", method = RequestMethod.POST)
+	public Response deleteZone(HttpServletRequest request,
+							   HttpServletResponse response,
+							   HttpSession session,
+							   @RequestBody ZoneManagementRequest zoneManagementRequest) {
+		logger.info("Entering :: RestZoneManagementServiceImpl :: deleteZone  method");
+		Response zoneManagementResponse = zoneServiceHandler.deleteZone(zoneManagementRequest);
+	    logger.info("Exiting :: RestZoneManagementServiceImpl :: deleteZone method");
+	    return zoneManagementResponse;
+	}
+
+}

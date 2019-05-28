@@ -1,0 +1,91 @@
+package com.chatak.beacon.rest.service.impl;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.chatak.beacon.handler.BeaconHandler;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.rest.service.RestBeaconService;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:30:23 AM
+ * @version 1.0
+ */
+@RestController
+@RequestMapping(value = "/beaconService", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestBeaconServiceImpl implements RestBeaconService {
+
+	private static Logger logger = Logger
+			.getLogger(RestBeaconServiceImpl.class);
+
+	@Autowired
+	BeaconHandler beaconHandler;
+
+	@RequestMapping(value = "/registerBeacon", method = RequestMethod.POST)
+	public Response registerBeaconDevice(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconRequest beaconRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: registerBeaconDevice method");
+		Response beaconResponse = beaconHandler
+				.createOrUpdateBeacon(beaconRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: registerBeaconDevice method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/searchBeaconProfiles", method = RequestMethod.POST)
+	public BeaconResponse searchBeaconProfiles(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconRequest beaconRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: searchBeaconProfiles method");
+		BeaconResponse beaconResponse = beaconHandler
+				.searchBeaconProfiles(beaconRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: searchBeaconProfiles method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/findBeaconProfileDetails", method = RequestMethod.POST)
+	public Response findBeaconProfileDetails(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconRequest beaconRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: findBeaconProfileDetails method");
+		Response beaconResponse = beaconHandler
+				.findBeaconProfileDetails(beaconRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: findBeaconProfileDetails method");
+		return beaconResponse;
+	}
+
+	@RequestMapping(value = "/deleteBeaconProfile", method = RequestMethod.POST)
+	public Response deleteBeaconProfile(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody Long beaconId) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: deleteBeaconProfile method");
+		Response beaconResponse = beaconHandler.deleteBeaconProfile(beaconId);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: deleteBeaconProfile method");
+		return beaconResponse;
+	}
+	
+	@RequestMapping(value = "/changeStatus", method = RequestMethod.POST)
+	public Response changeStatus(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			@RequestBody BeaconRequest beaconRequest) {
+		logger.info("Entering :: RestController :: RestBeaconServiceImpl :: changeStatus method");
+		Response beaconResponse = beaconHandler.changeStatus(beaconRequest);
+		logger.info("Exiting :: RestController :: RestBeaconServiceImpl :: changeStatus method");
+		return beaconResponse;
+	}
+
+}

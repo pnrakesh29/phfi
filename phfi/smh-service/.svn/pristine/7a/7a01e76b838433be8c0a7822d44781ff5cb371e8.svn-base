@@ -1,0 +1,254 @@
+/**
+ * 
+ */
+package com.chatak.beacon.handler.impl;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.AdminUserDao;
+import com.chatak.beacon.dao.LoginSessionDetailsDao;
+import com.chatak.beacon.dao.model.AdminUser;
+import com.chatak.beacon.dao.model.LoginSessionDetails;
+import com.chatak.beacon.enums.UserPasswordStatus;
+import com.chatak.beacon.handler.LoginHandler;
+import com.chatak.beacon.model.LoginRequest;
+import com.chatak.beacon.model.LoginResponse;
+import com.chatak.beacon.model.LoginSessionDetailsRequest;
+import com.chatak.beacon.model.LoginSessionDetailsResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.PasswordHandler;
+import com.chatak.beacon.util.StringUtil;
+
+@Service
+public class LoginHandlerImpl implements LoginHandler {
+
+  private static Logger logger = Logger.getLogger(LoginHandlerImpl.class);
+
+  @Autowired
+  private AdminUserDao adminUserDao;
+  
+  @Autowired
+  private LoginSessionDetailsDao loginSessionDetailsDao;
+
+  /**
+   * Service method to authenticate the user
+   * 
+   * @param loginDetails
+   * @return
+   */
+  public LoginResponse authenticate(LoginRequest loginRequest) {
+
+    logger.info("Entering ::LoginHandlerImpl :: authenticate method");
+    LoginResponse loginResponse = new LoginResponse();
+    try {
+    	   AdminUser adminUser = adminUserDao.authenticateChatakAdminUser(loginRequest.getSpUser());
+    	      if(!StringUtil.isNull(adminUser)) {
+    				if(null == adminUser.getPassRetryCount() || adminUser.getPassRetryCount().intValue() < Constant.PASS_RETRY_COUNT) {
+    					if(adminUser.getStatus().equals(Constant.ACTIVE)) {
+    						if(adminUser != null && PasswordHandler.isValidPassword(loginRequest.getSpPass(), adminUser.getPassword()))  {
+    							adminUser.setPassRetryCount(Constant.ZERO);	
+    							logger.info("info::LoginHandlerImpl ::before saveOrUpdate:: method  :::: login");
+    							adminUserDao.saveOrUpdateAdminUser(adminUser);
+    							if(adminUser.getLoginMode() != null) {
+    								if(null != adminUser.getLastPassWordChange()){
+    									Timestamp lastPasswordChangeDate = adminUser.getLastPassWordChange();
+    									Calendar cal = Calendar.getInstance();
+    									cal.setTime(lastPasswordChangeDate);
+    									cal.add(Calendar.DATE, Constant.PASS_EXPIRE_DAYS);
+    									Date expiryDate = cal.getTime();
+
+    									Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+    									Calendar currentCal = Calendar.getInstance();
+    									currentCal.setTime(currentTime);
+    									Date currentdate = currentCal.getTime();
+
+    									// password expired   
+    								if(expiryDate.compareTo(currentdate) == Constant.ZERO || expiryDate.compareTo(currentdate) < Constant.ZERO ) {
+    									adminUser.setLoginMode(Long.valueOf(UserPasswordStatus.EXPIRED.ordinal()));	
+    									logger.info("info::LoginHandlerImpl ::before saveOrUpdate UserPasswordStatus EXPIRED:: method  :::: login");
+    									adminUserDao.saveOrUpdateAdminUser(adminUser);
+    									loginResponse.setResponseCode(ErrorCode.ERROR_CODE_117);
+    									loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_117));
+    									loginResponse.setStatus(true);
+    									return loginResponse;
+    								}
+    								}
+    								//login mode 0
+    								if(adminUser.getLoginMode().toString().equals(Integer.toString(UserPasswordStatus.FIRSTTIMELOGIN.ordinal()))) {
+    									loginResponse.setResponseCode(ErrorCode.ERROR_CODE_119);
+    									loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_119));
+    									loginResponse.setStatus(true);
+    									logger.info("info::LoginHandlerImpl ::before login mode 0:: method  :::: login");
+    									return loginResponse;
+    								}       
+    								//login mode 2 
+    								if(adminUser.getLoginMode().toString().equals(Integer.toString(UserPasswordStatus.RESETPASWORD.ordinal()))) {
+    									loginResponse.setResponseCode(ErrorCode.ERROR_CODE_118);
+    									loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_118));
+    									loginResponse.setStatus(true);
+    									logger.info("info::LoginHandlerImpl ::before login mode 2:: method  :::: login");
+    									return loginResponse;
+    								}
+    								//login mode 3
+    								if(adminUser.getLoginMode().toString().equals(Integer.toString(UserPasswordStatus.RESETPASWORD.ordinal()))) {
+    									loginResponse.setResponseCode(ErrorCode.ERROR_CODE_117);
+    									loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_117));
+    									loginResponse.setStatus(true);
+    									logger.info("info::LoginHandlerImpl ::before login mode 3:: method  :::: login");
+    									return loginResponse;
+    								}
+    								//login mode > 3
+    								if((adminUser.getLoginMode()>Long.valueOf(UserPasswordStatus.EXPIRED.ordinal()))) {
+    									loginResponse.setResponseCode(ErrorCode.ERROR_CODE_68);
+    									loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_68));
+    									loginResponse.setStatus(false);
+    									logger.info("info::LoginHandlerImpl ::before login mode >3:: method  :::: login");
+    									return loginResponse;
+    								}
+    							}
+    							if((adminUser.getStatus().equals(Constant.ACTIVE))){
+    								loginResponse.setUserName(adminUser.getUserName());
+    								loginResponse.setEmail(adminUser.getEmail());
+    								loginResponse.setFirstName(adminUser.getFirstName());
+    								loginResponse.setLastName(adminUser.getLastName());
+    								loginResponse.setLoginMode(adminUser.getLoginMode());
+    								loginResponse.setUserId(adminUser.getAdminUserId());
+    								loginResponse.setUserType(adminUser.getUserType());
+    								loginResponse.setStatus(true);
+    								loginResponse.setResponseCode(ErrorCode.ERROR_CODE_00);
+    								loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+    							} else {
+    								loginResponse.setStatus(false);
+    								loginResponse.setResponseCode(ErrorCode.ERROR_CODE_68);
+    								loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_68));
+    							}
+    						} else {
+    							int count;
+    							if(adminUser.getPassRetryCount() != null){
+    								count = adminUser.getPassRetryCount().intValue();
+    							} else{
+    								count=0;
+    							}
+    							if(count!=Constant.PASS_RETRY_COUNT){
+    								int passsCount = adminUser.getPassRetryCount();
+    								adminUser.setPassRetryCount(passsCount+1);
+    								logger.info("info::LoginHandlerImpl ::before saveOrUpdate:: method  :::: login");
+    								adminUserDao.saveOrUpdateAdminUser(adminUser);
+    								loginResponse.setStatus(false);
+    								loginResponse.setResponseCode(ErrorCode.ERROR_CODE_63);
+    								loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_63));
+    								if(count+1 == Constant.PASS_RETRY_COUNT) {
+    									adminUser.setPassRetryCount(0);
+    									adminUser.setStatus(Constant.SUSPEND);
+    									adminUserDao.saveOrUpdateAdminUser(adminUser);
+    									loginResponse.setResponseCode(ErrorCode.ERROR_CODE_120);
+    									loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_120));
+    								}
+
+    							}
+    						}
+    					} else {
+    						loginResponse.setStatus(false);
+    						 loginResponse.setResponseCode(ErrorCode.ERROR_CODE_121);
+    						 loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_121));
+    					}
+    				} else {
+    					loginResponse.setStatus(false);
+    					loginResponse.setResponseCode(ErrorCode.ERROR_CODE_120);
+    					loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_120));
+    				}
+
+    			} else  {    
+    				if(loginRequest.getSpUser() != null)
+    				  loginResponse.setStatus(false);
+    				  loginResponse.setResponseCode(ErrorCode.ERROR_CODE_63);
+    				  loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_63));
+
+    			}
+    	    }
+    	    catch(DataAccessException e) {
+    	      logger.error("Error :: LoginHandlerImpl :: authenticate method", e);
+    	      loginResponse.setResponseCode(ErrorCode.ERROR_CODE_99);
+    	      loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    	    }
+    	    catch(Exception e) {
+    	      logger.error("Error :: LoginHandlerImpl :: authenticate method", e);
+    	      loginResponse.setResponseCode(ErrorCode.ERROR_CODE_99);
+    	      loginResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    	    }
+    	    logger.info("Exiting :: LoginHandlerImpl :: authenticate method");
+    	    return loginResponse;
+    	  }
+  
+  @Override
+	public Response  saveLoginSessionDetails(LoginSessionDetailsRequest loginSessionDetailsRequest)  {
+		logger.info("prepaidservice :: LoginHandlerImpl :: saveSessionDetails Entering");
+		Response response = new Response();
+		try {
+			LoginSessionDetails sessionDetails = CommonUtil.copyBeanProperties(loginSessionDetailsRequest, LoginSessionDetails.class);
+			loginSessionDetailsDao.saveOrUpdateSessionDetails(sessionDetails);
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+		    response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+		} catch (Exception e) {
+			logger.error("Error :: LoginHandlerImpl :: saveSessionDetails method", e);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: LoginHandlerImpl :: saveSessionDetails method");
+		return response;
+	}
+	
+	    @Override
+		public LoginSessionDetailsResponse getSessionDetailsById(LoginSessionDetailsRequest loginSessionDetailsRequest) {
+			logger.info("prepaidservice :: LoginHandlerImpl :: getSessionDetailsById Entering");
+			LoginSessionDetailsResponse sessionDetailsResponse = new LoginSessionDetailsResponse();
+			try {
+				List<LoginSessionDetailsRequest> loginSessionDetails = loginSessionDetailsDao.searchLoginSessionDetails(loginSessionDetailsRequest);
+				if (CommonUtil.isListNotNullAndEmpty(loginSessionDetails)) {
+					sessionDetailsResponse.setLoginSessionDetailsRequest(loginSessionDetails);
+				}
+				sessionDetailsResponse.setResponseCode(ErrorCode.ERROR_CODE_00);
+				sessionDetailsResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+				return sessionDetailsResponse;
+			} catch (Exception e) {
+				logger.error("Error :: LoginHandlerImpl :: getSessionDetailsById method", e);
+				sessionDetailsResponse.setResponseCode(ErrorCode.ERROR_CODE_99);
+				sessionDetailsResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+			}
+			logger.info("Exiting :: LoginHandlerImpl :: getSessionDetailsById method");
+			return sessionDetailsResponse;
+		}
+	    
+	    @Override
+		public Response  updateLoginSessionDetails(LoginSessionDetailsRequest loginSessionDetailsRequest) {
+			logger.info("prepaidservice :: LoginHandlerImpl :: updateLoginSessionDetails Entering");
+			Response response = new Response();
+			try {
+				LoginSessionDetails sessionDetails = CommonUtil.copyBeanProperties(loginSessionDetailsRequest, LoginSessionDetails.class);
+				if(sessionDetails.getId() != null){
+					logger.info("LoginHandlerImpl :: Before saveOrUpdateSessionDetails");
+					loginSessionDetailsDao.saveOrUpdateSessionDetails(sessionDetails);
+				}
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+			    response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+			} catch (Exception e) {
+				logger.error("Error :: LoginHandlerImpl :: updateLoginSessionDetails method", e);
+				response.setResponseCode(ErrorCode.ERROR_CODE_99);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+			}
+			logger.info("Exiting :: LoginHandlerImpl :: updateLoginSessionDetails method");
+			return response;
+	    }
+
+}

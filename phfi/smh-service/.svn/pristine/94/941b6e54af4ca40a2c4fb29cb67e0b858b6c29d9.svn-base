@@ -1,0 +1,10 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.Response;
+
+public interface UtilityHandler {
+
+	public Response getStatesByCountry(String name);
+
+	public Response getCountries();
+}

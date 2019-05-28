@@ -1,0 +1,7 @@
+
+xsquid:S2147¾"ECombine this catch with the one at line 185, which has the same body.(ñ“Š±üÿÿÿÿHèRMINORZ
+CODE_SMELL
+‚squid:S37766"RRefactor this method to reduce its Cognitive Complexity from 86 to the 15 allowed.(ˆ–ÌëHéRCRITICALZ
+CODE_SMELL
+ºsquid:S2681´"†This line will not be executed conditionally; only the first line of this 2-line block will be. The rest will execute unconditionally.(•ù‰âúÿÿÿÿHêRMAJORZ
+CODE_SMELL

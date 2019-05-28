@@ -1,0 +1,32 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.exception.BeaconServiceException;
+
+
+public interface RolesServiceProviderMappingDao {
+	
+  public Long addRoleServiceProvider(Long roleId,Long serviceProviderId,  Long subServiceProviderId, String status, String createdBy) throws DataAccessException,BeaconServiceException;
+
+  public List<String> getServiceProviderOnRoleId(Long roleId) throws DataAccessException;
+
+  public Long getServiceProvider(Long roleId) throws DataAccessException;
+
+  public List<String> getSubServiceProviderOnRoleId(Long roleId) throws DataAccessException;
+
+  public void deleteServiceProvidermappingData(Long roleId) throws DataAccessException;
+
+  public List<String> getServiceProviderNameOnRoleId(Long roleId) throws DataAccessException;
+
+  public List<String> getSubServiceProviderNameOnRoleId(Long roleId) throws DataAccessException;
+
+  public Long getServiceProviderHistory(Long roleId, String action) throws DataAccessException;
+
+  public List<String> getServiceProviderOnRoleIdHistory(Long roleId, String action) throws DataAccessException;
+
+  public List<String> getSubServiceProviderOnRoleIdHistory(Long roleId, String action) throws DataAccessException;
+
+}

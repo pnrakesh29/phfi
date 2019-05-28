@@ -1,0 +1,22 @@
+/**
+ * 
+ */
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.LoginRequest;
+import com.chatak.beacon.model.LoginResponse;
+import com.chatak.beacon.model.LoginSessionDetailsRequest;
+import com.chatak.beacon.model.LoginSessionDetailsResponse;
+import com.chatak.beacon.model.Response;
+
+public interface LoginHandler {
+
+	public LoginResponse authenticate(LoginRequest loginDetails);
+
+	public Response saveLoginSessionDetails(LoginSessionDetailsRequest loginSessionDetails);
+
+	public LoginSessionDetailsResponse getSessionDetailsById(LoginSessionDetailsRequest addLoginSessionDetails);
+
+	public Response updateLoginSessionDetails(LoginSessionDetailsRequest loginSessionDetailsRequest);
+
+}

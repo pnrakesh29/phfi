@@ -1,0 +1,344 @@
+package com.chatak.beacon.handler.impl;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.AdminUserDao;
+import com.chatak.beacon.dao.model.AdminUser;
+import com.chatak.beacon.enums.UserPasswordStatus;
+import com.chatak.beacon.exception.BeaconServiceException;
+import com.chatak.beacon.handler.AdminProfileHandler;
+import com.chatak.beacon.mailsender.service.impl.MailServiceManagementImpl;
+import com.chatak.beacon.model.AdminForgotPasswordRequest;
+import com.chatak.beacon.model.AdminUserRequest;
+import com.chatak.beacon.model.AdminUserResponse;
+import com.chatak.beacon.model.ChangeAdminPasswordRequest;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.SecurityQuestionRequest;
+import com.chatak.beacon.model.SecurityQuestionResponse;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.EncryptionUtil;
+import com.chatak.beacon.util.PasswordHandler;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+import com.chatak.beacon.velocity.IVelocityTemplateCreator;
+import com.chatak.beacon.velocity.impl.VelocityTemplateCreatorImpl;
+
+
+@Service("adminProfileHandler")
+public class AdminProfileHandlerImpl implements AdminProfileHandler {
+	
+	public static Logger logger = Logger.getLogger(AdminProfileHandlerImpl.class);
+	
+	@Autowired
+	private AdminUserDao adminUserDao;
+	
+	@Autowired
+	MailServiceManagementImpl mailServiceManagementImpl;
+	
+	@Override
+	public Response forgotPassword(AdminForgotPasswordRequest adminForgotPasswordRequest) throws BeaconServiceException {
+		logger.info("AdminProfileHandlerImpl :::: method  :::: forgotPassword");
+		Response response = new Response();
+		try {
+			List<AdminUser> adminUserList = adminUserDao.findByUserName(adminForgotPasswordRequest.getUserName().toLowerCase());
+				if (!StringUtil.isListNotNullNEmpty(adminUserList)) {
+					response.setResponseCode(ErrorCode.ERROR_CODE_77);
+					response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_77));
+					return response;
+				}
+				AdminUser adminUser = adminUserList.get(0);
+				 if (!adminForgotPasswordRequest.getSecurityAnswer().equals(EncryptionUtil.decrypt(adminUser.getSecurityAnswer()))) {
+					    response.setResponseCode(ErrorCode.ERROR_CODE_76);
+						response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_76));
+						return response;
+				 } else {
+					String password = PasswordHandler.getSystemGeneratedPassword(8);
+					Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+					adminUser.setPassword(PasswordHandler.bCryptEncode(password));
+					adminUser.setUpdatedDate(currentDate);
+					adminUser.setLoginMode((long)UserPasswordStatus.RESETPASWORD.ordinal());
+					logger.info("AdminProfileHandlerImpl :::: method  :::: forgotPassword::before changeAgentPassword");
+					adminUserDao.saveOrUpdateAdminUser(adminUser);
+					sendEmailNotification(adminUser.getEmail(), adminUser.getFirstName(), password);
+					 response.setResponseCode(ErrorCode.ERROR_CODE_00);
+					 response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+				}
+			} catch (Exception e) {
+					logger.error("ERROR: AdminProfileHandlerImpl:: forgotPassword method", e);
+					response.setResponseCode(ErrorCode.ERROR_CODE_99);
+					response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+			}
+			return response;
+	}
+	
+	@Override
+	public Response changePassword(ChangeAdminPasswordRequest changePasswordRequest) throws BeaconServiceException {
+		 logger.info("Entering:: AdminProfileHandlerImpl:: changePassword method: ");
+		  Response response = new Response();
+		 try {
+	        	List<AdminUser> aminUserList = adminUserDao.findByUserName(changePasswordRequest.getUserName());
+	        	AdminUser adminUser = aminUserList.get(0);
+	        	if(adminUser == null) {
+	        		response.setResponseCode(ErrorCode.ERROR_CODE_79);
+	        		response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_79));
+	        		logger.info("info:: AdminProfileHandlerImpl:::changePassword method: ");
+	        		return response;
+	        	} 
+	        	
+	        	if(adminUser.getStatus().equals(Constant.ACTIVE)) {
+	        	
+	        	if(!PasswordHandler.isValidPassword(changePasswordRequest.getOldPass(),adminUser.getPassword())) {
+	            	response.setResponseCode(ErrorCode.ERROR_CODE_127);
+	            	response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_127));
+	            	logger.info("info:: AdminProfileHandlerImpl::samePasswords ::changePassword method: ");
+	            	return response;
+	            }	
+	        		
+	        	if(changePasswordRequest.getNewPass().equals(changePasswordRequest.getOldPass())) {
+	        		response.setResponseCode(ErrorCode.ERROR_CODE_80);
+	        		response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_80));
+	        		logger.info("info:: AdminProfileHandlerImpl::samePasswords ::changePassword method: ");
+	        		return response;
+	        	} else if(adminUser != null  && changePasswordRequest.getNewPass().equals(adminUser.getPassword())) {
+	        		response.setResponseCode(ErrorCode.ERROR_CODE_116);
+	        		response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_116));
+	        		return response;
+	        		}  else {
+					Boolean flag = true;
+					String previousPasswords = adminUser.getPreviousPasswords();
+					if (!StringUtil.isNullEmpty(previousPasswords)) {
+						StringTokenizer password = new StringTokenizer(previousPasswords, "|");
+						while (password.hasMoreElements()) {
+							if (PasswordHandler.isValidPassword(changePasswordRequest.getNewPass(), password.nextElement().toString())) {
+								response.setResponseCode(ErrorCode.ERROR_CODE_116);
+				        		response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_116));
+								flag=false;
+								break;
+							}
+						}
+					}
+						while (flag) {
+							if(!StringUtil.isNullEmpty(previousPasswords)){
+								LimitedQueue<String> limitedQueue = new LimitedQueue(3);
+								StringTokenizer passwords = new StringTokenizer(previousPasswords, "|");
+								while (passwords.hasMoreElements()) {
+									 limitedQueue.add(passwords.nextElement().toString());
+								}
+								limitedQueue.add(PasswordHandler.bCryptEncode(changePasswordRequest.getNewPass()));
+								adminUser.setPreviousPasswords(StringUtils.join(limitedQueue, "|"));
+							}else{
+								LimitedQueue<String> limitedQueue = new LimitedQueue(3);
+								limitedQueue.add(PasswordHandler.bCryptEncode(changePasswordRequest.getNewPass()));
+								adminUser.setPreviousPasswords(StringUtils.join(limitedQueue, "|"));
+							}
+						
+						if(!StringUtil.isNullEmpty(changePasswordRequest.getSecurityAnswer()) && !StringUtil.isNullEmpty(changePasswordRequest.getSecurityQuestion())) {
+							adminUser.setSecurityQuestion(changePasswordRequest.getSecurityQuestion());
+							adminUser.setSecurityAnswer(EncryptionUtil.encrypt(changePasswordRequest.getSecurityAnswer()));
+						}
+							Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+							//update new password
+				        	adminUser.setPassword(PasswordHandler.bCryptEncode(changePasswordRequest.getNewPass()));
+				        	adminUser.setUpdatedBy(changePasswordRequest.getCreatedBy());
+				        	adminUser.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+				        	adminUser.setLoginMode(Long.valueOf(UserPasswordStatus.ACTIVE.ordinal()));
+				        	adminUserDao.saveOrUpdateAdminUser(adminUser);
+				        	logger.info("info:: AdminProfileHandlerImpl::changePassword ::updating password::changePassword method: ");
+				        	response.setResponseCode(ErrorCode.ERROR_CODE_00);
+				        	response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+				        	break;
+							}
+						}
+	        	 } else {
+	        		 response.setResponseCode(ErrorCode.ERROR_CODE_121);
+	        		 response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_121));
+					}
+		 		} catch(Exception e) {
+		 			logger.error("ERROR:: AdminProfileHandlerImpl:: changePassword ", e);
+		 			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+		 			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		 		}
+		 	return response;
+	}
+	
+	@Override
+	public SecurityQuestionResponse getSecurityQuestion(SecurityQuestionRequest securityQuestionRequest) throws BeaconServiceException {
+		logger.info("Entering::AdminProfileHandlerImpl :::: method  :::: getSecurityQuestion");
+		SecurityQuestionResponse response = new SecurityQuestionResponse();
+			try {
+				List<AdminUser>  adminUserList = adminUserDao.findByUserName(securityQuestionRequest.getUserName().toLowerCase());
+				if(StringUtil.isListNotNullNEmpty(adminUserList)){
+					response.setSecurityQuestion(adminUserList.get(0).getSecurityQuestion());
+					response.setResponseCode(ErrorCode.ERROR_CODE_00);
+		        	response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+				} else{
+					response.setResponseCode(ErrorCode.ERROR_CODE_99);
+		        	response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+				}
+			} catch (Exception e) {
+				logger.error("ERROR: AdminProfileHandlerImpl:: getSecurityQuestion method", e);
+				response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	        	response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+			}
+			return response;
+	}
+	
+	private void sendEmailNotification(final String toMail, final String FirstName, final String password) {
+		try {
+			logger.debug("Sending Email to the registered Email: ");
+			String subject = Properties.getProperty("chatak.email.admin.changepass.subject");
+			String emailBody = readHtmlContent(Properties.getProperty("chatak.email.template.file.path") + File.separator + Properties.getProperty("chatak.email.customer.forgot.password.file"));
+
+			String url = null;
+			if (emailBody != null && !emailBody.equals("")) {
+			    url = Properties.getProperty("chatak.admin.beacon.user.redirection.url");
+				emailBody = MessageFormat.format(emailBody, FirstName, password);
+			}
+			IVelocityTemplateCreator iVelocityTemplateCreator = new VelocityTemplateCreatorImpl();
+			Map<String,String> dataMap = new HashMap<String,String>();
+			dataMap.put("firstName", FirstName);
+			dataMap.put("tempPassword", password);
+			dataMap.put("adminUserUrl", url);
+			
+			String fromAddress = Properties.getProperty("chatak.from.email.id");
+			String mailBodyString = iVelocityTemplateCreator.createEmailTemplate(dataMap, Constant.CREATE_ADMIN_FORGOT_PASSWORD_TEMPLATE);
+			mailServiceManagementImpl.sendMailHtml(fromAddress, mailBodyString, toMail, subject);
+		} catch (FileNotFoundException e) {
+			logger.error("Error in sending Email : ");
+			logger.error("ERROR: AdminProfileHandlerImpl:: sendEmailNotification method", e);
+		} catch (Exception e) {
+			logger.error("Error in sending Email : ");
+			logger.error("ERROR: AdminProfileHandlerImpl:: sendEmailNotification method", e);
+		}
+	}
+
+	/**
+	 * method to read the HTML content of the Email Templete
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	private String readHtmlContent(String filePath) throws Exception {
+		logger.info("Entering:: AdminProfileHandlerImpl:: readHtmlContent method: ");
+		String content = null;
+		ClassPathResource cpr = new ClassPathResource(filePath);
+		InputStream is = cpr.getInputStream();
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String line;
+		StringBuffer result = new StringBuffer();
+		while ((line = br.readLine()) != null) {
+			result.append(line);
+			result.append("\n");
+		}
+		content = result.toString();
+		br.close();
+		is.close();
+		return content;
+	}
+	
+	class LimitedQueue<E> extends LinkedList<E> {
+		private static final long serialVersionUID = -3629542769097625683L;
+		private int limit;
+	    public LimitedQueue(int limit) {
+	        this.limit = limit;
+	    }
+
+	    @Override
+	    public boolean add(E o) {
+	        boolean added = super.add(o);
+	        while (added && size() > limit) {
+	           super.remove();
+	        }
+	        return added;
+	    }
+	}
+	
+	@Override
+	public Response updateUserProfile(AdminUserRequest adminUserRequest) throws BeaconServiceException {
+	  	  logger.info("Entering:: AdminProfileHandlerImpl:: updateUserProfile method: ");
+	  	  Response response = new Response();
+	      try {
+	    	  List<AdminUser> adminUsersList = adminUserDao.findByUserEmailId(adminUserRequest.getEmail());
+    	      if(StringUtil.isListNotNullNEmpty(adminUsersList)) {
+    	        Boolean emailExists = Boolean.FALSE;
+    	        for(AdminUser adminUserData : adminUsersList) {
+    	          if(adminUserData.getAdminUserId().compareTo(adminUserRequest.getAdminUserId()) != 0) {
+    	            emailExists = Boolean.TRUE;
+    	            break;
+    	          }
+    	        }
+    	        if(emailExists) {
+    	          response.setResponseCode(ErrorCode.ERROR_CODE_109);
+    	          response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_109));
+    	          logger.error("info:: AdminProfileHandlerImpl:: email already exist:: addUpdateAdminUser method: ");
+    	          return response;
+    	        }
+    	      }
+    		  
+    		  AdminUser adminUserFromDB = adminUserDao.findByAdminUserId(adminUserRequest.getAdminUserId());
+	    	  adminUserFromDB.setFirstName(adminUserRequest.getFirstName());
+	    	  adminUserFromDB.setLastName(adminUserRequest.getLastName());
+	    	  adminUserFromDB.setPhone(adminUserRequest.getPhone());
+	    	  adminUserFromDB.setEmail(adminUserRequest.getEmail());
+	    	  adminUserFromDB.setUpdatedDate(DateUtil.getCurrentTimestamp());
+	    	  adminUserFromDB.setSecurityQuestion(adminUserRequest.getSecurityQuestion());
+	    	  adminUserFromDB.setSecurityAnswer(EncryptionUtil.encrypt(adminUserRequest.getSecurityAnswer()));
+	    	  adminUserDao.saveOrUpdateAdminUser(adminUserFromDB);
+	    	  response.setResponseCode(ErrorCode.ERROR_CODE_00);
+			  response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+	      } catch(Exception e) {
+	    	  logger.error("ERROR: AdminProfileServiceImpl:: updateUserProfile method", e);
+	    	  response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	    	  response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	      }
+	      return response;
+	    }
+	
+	 @Override
+		public AdminUserResponse findByAdminUserId(Long adminUserId) {
+			logger.info("Entering :: AdminProfileHandlerImpl :: findByAdminUserId method");
+			AdminUserResponse response = new AdminUserResponse();
+			List<AdminUserRequest> responseList = new ArrayList<AdminUserRequest>();
+			try{
+				AdminUser adminUser = adminUserDao.findByAdminUserId(adminUserId);
+				if(adminUser == null) {
+					response.setResponseCode(ErrorCode.ERROR_CODE_107);
+					response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_107));
+					return response;
+				}
+				AdminUserRequest adminUserRequest = CommonUtil.copyBeanProperties(adminUser, AdminUserRequest.class);
+				responseList.add(adminUserRequest);
+				response.setAdminUserList(responseList);
+				response.setResponseCode(ErrorCode.ERROR_CODE_00);
+			    response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+			} catch (Exception e) {
+				logger.error("Error :: AdminProfileHandlerImpl :: findByAdminUserId method", e);
+				response.setResponseCode(ErrorCode.ERROR_CODE_99);
+				response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+			}
+			logger.info("Exiting :: AdminProfileHandlerImpl :: findByAdminUserId method");
+			
+			return response;
+		}   
+}

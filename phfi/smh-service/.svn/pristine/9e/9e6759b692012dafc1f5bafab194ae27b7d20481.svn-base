@@ -1,0 +1,24 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.exception.BeaconServiceException;
+import com.chatak.beacon.model.AdminForgotPasswordRequest;
+import com.chatak.beacon.model.AdminUserRequest;
+import com.chatak.beacon.model.AdminUserResponse;
+import com.chatak.beacon.model.ChangeAdminPasswordRequest;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.SecurityQuestionRequest;
+import com.chatak.beacon.model.SecurityQuestionResponse;
+
+public interface AdminProfileHandler {
+
+	public Response forgotPassword(AdminForgotPasswordRequest adminForgotPasswordRequest) throws BeaconServiceException;
+
+	public Response changePassword(ChangeAdminPasswordRequest changePasswordRequest) throws BeaconServiceException;
+
+	public SecurityQuestionResponse getSecurityQuestion(SecurityQuestionRequest securityQuestionRequest) throws BeaconServiceException;
+
+	public Response updateUserProfile(AdminUserRequest adminUserRequest) throws BeaconServiceException;
+
+	public AdminUserResponse findByAdminUserId(Long adminUserId) throws BeaconServiceException;
+
+}

@@ -1,0 +1,23 @@
+package com.chatak.beacon.dao.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.dao.UserRoleEntityMapDao;
+import com.chatak.beacon.dao.model.UserRoleEntityMap;
+import com.chatak.beacon.dao.repository.UserRoleEntityMapRepository;
+
+
+@Repository("userRoleEntityMapDao")
+public class UserRoleEntityMapDaoImpl implements UserRoleEntityMapDao{
+	
+	@Autowired
+	private UserRoleEntityMapRepository userRoleEntityMapRepository;
+	
+	@Override
+	public UserRoleEntityMap findByUserRoleId(Long userRoleId) throws DataAccessException,Exception{
+		 return userRoleEntityMapRepository.findByUserRoleId(userRoleId);
+	}
+
+}

@@ -1,0 +1,26 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconResponse;
+import com.chatak.beacon.model.Response;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:45:23 AM
+ * @version 1.0
+ */
+public interface BeaconHandler {
+	
+	public Response createOrUpdateBeacon(BeaconRequest beaconRequest);
+	
+	public BeaconResponse searchBeaconProfiles(BeaconRequest beaconRequest);
+	
+	public BeaconResponse findBeaconProfileDetails(BeaconRequest beaconRequest);
+	
+	public Response deleteBeaconProfile(Long beaconId);
+	
+	public Response changeStatus(BeaconRequest beaconRequest);
+	
+}

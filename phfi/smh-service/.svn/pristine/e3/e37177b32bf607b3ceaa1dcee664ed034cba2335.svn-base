@@ -1,0 +1,207 @@
+package com.chatak.beacon.handler.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.ZoneDao;
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.enums.Status;
+import com.chatak.beacon.handler.ZoneHandler;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.LocationResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneRequest;
+import com.chatak.beacon.model.ZoneResponse;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+@Service("zoneHandler")
+public class ZoneHandlerImpl implements ZoneHandler{
+	
+	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	@Autowired
+	private ZoneDao zoneDao;
+	
+	@Override
+	public Response createOrUpdateZone(ZoneRequest zoneRequest) {
+		 logger.info("Entering:: ZoneServiceHandlerImpl:: createOrUpdateZone method");
+		Response response = new Response();
+		try{
+			List<Zone> zone = zoneDao.findById(zoneRequest.getId());
+			if(CommonUtil.isListNotNullAndEmpty(zone)){
+				Zone zoneUpdate = CommonUtil.copyBeanProperties(zone.get(0), Zone.class);
+				Zone zoneData =updateZoneDetails(zoneUpdate,zoneRequest);
+				zoneDao.createOrUpdate(zoneData);
+				response.setResponseCode(ErrorCode.ZONE_UPDATED);
+		   	    response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_UPDATED));
+		   	    return response;
+			}
+			Zone createZone = createZoneData(zoneRequest);
+			zoneDao.createOrUpdate(createZone);
+			response.setResponseCode(ErrorCode.ZONE_CREATED);
+	   	    response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_CREATED));
+		}catch(DataAccessException e) {
+   	      logger.error("Error :: ZoneServiceHandlerImpl :: createOrUpdateZone method", e);
+   	      response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(ErrorCode.SYSTEM_ERROR));
+   	    }
+   	    catch(Exception e) {
+   	      logger.error("Error :: ZoneServiceHandlerImpl :: createOrUpdateZone method", e);
+   	   response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+	      response.setResponseMessage(Properties.getProperty(ErrorCode.SYSTEM_ERROR));
+   	    }
+		return response;
+	}
+
+	private Zone createZoneData(ZoneRequest zoneRequest) {
+		Zone zone = new Zone();
+		zone.setZoneName(zoneRequest.getZoneName());
+		zone.setLattitude(zoneRequest.getLattitude());
+		zone.setLongitude(zoneRequest.getLattitude());
+		zone.setGeofence(zoneRequest.getGeofence());
+		zone.setLocationId(zoneRequest.getLocationId());
+		zone.setRadius(zoneRequest.getRadius());
+		zone.setType(zoneRequest.getType());
+		zone.setSubType(zoneRequest.getSubType());
+		zone.setCreatedBy("ADMIN");
+		zone.setCreatedDate(DateUtil.getCurrentTimestamp());
+		zone.setStatus(Status.Active.toString());
+		return zone;
+	}
+	private Zone updateZoneDetails(Zone zone,ZoneRequest zoneRequest) {
+		zone.setId(zone.getId());
+		zone.setZoneName(zoneRequest.getZoneName());
+		zone.setLattitude(zoneRequest.getLattitude());
+		zone.setLongitude(zoneRequest.getLattitude());
+		zone.setGeofence(zoneRequest.getGeofence());
+		zone.setLocationId(zoneRequest.getLocationId());
+		zone.setRadius(zoneRequest.getRadius());
+		zone.setType(zoneRequest.getType());
+		zone.setSubType(zoneRequest.getSubType());
+		zone.setUpdatedBy("ADMIN");
+		zone.setUpdatedDate(DateUtil.getCurrentTimestamp());
+		return zone;
+	}
+
+	@Override
+	public Response searchZone(ZoneRequest zoneRequest) {
+		 logger.info("Entering :: ZoneHandlerImpl :: searchZone method");
+		 ZoneResponse response = new ZoneResponse();
+		    List<ZoneRequest> zoneRequests = new ArrayList<ZoneRequest>();
+		    try {
+		      List<Zone> zoneManagement = zoneDao.searchZone(zoneRequest);
+		      if(StringUtil.isListNotNullNEmpty(zoneManagement)) {
+		    	  zoneRequests = CommonUtil.copyListBeanProperty(zoneManagement, ZoneRequest.class);
+		        response.setZoneRequest(zoneRequests);
+		      }
+		      response.setNoOfRecords(zoneRequest.getNoOfRecords());
+		      response.setResponseCode(ErrorCode.SUCCESS);
+		        response.setResponseMessage(Properties.getProperty(ErrorCode.SUCCESS));
+		    }
+		    catch(Exception e) {
+		      logger.error("Error :: ZoneHandlerImpl :: searchZone method", e);
+		      response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+	   	      response.setResponseMessage(Properties.getProperty(ErrorCode.SYSTEM_ERROR));
+		    }
+		    logger.info("Exiting :: ZoneHandlerImpl :: searchZone method");
+
+		    return response;
+	}
+
+	@Override
+	public ZoneResponse findZoneById(ZoneRequest zoneRequest) {
+	    logger.info("Entering :: ZoneHandlerImpl :: findServiceProviderById method");
+	    ZoneResponse response = new ZoneResponse();
+	    List<ZoneRequest> responseList = new ArrayList<ZoneRequest>();
+	    try {
+	    	List<Zone> zoneManagement = zoneDao.findById(zoneRequest.getId());
+	      if(!StringUtil.isListNotNullNEmpty(zoneManagement)) {
+	        response.setResponseCode(ErrorCode.ZONE_NOT_FOUND);
+	        response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_NOT_FOUND));
+	        return response;
+	      }
+	      ZoneRequest zoneData = CommonUtil.copyBeanProperties(zoneManagement.get(0),ZoneRequest.class);
+	      responseList.add(zoneData);
+	      response.setZoneRequest(responseList);
+	      response.setResponseCode(ErrorCode.SUCCESS);
+	      response.setResponseMessage(Properties.getProperty(ErrorCode.SUCCESS));
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: ServiceProviderServiceImpl :: findServiceProviderById method", e);
+	      response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(ErrorCode.SYSTEM_ERROR));
+	    }
+	    logger.info("Exiting :: ServiceProviderServiceImpl :: findServiceProviderById method");
+
+	    return response;
+	  }
+
+	@Override
+	public Response deleteZone(ZoneRequest zoneRequest) {
+	    logger.info("Entering :: ServiceProviderServiceImpl :: deleteZone method");
+	    ZoneResponse response = new ZoneResponse();
+	    try {
+	    	List<Zone> zone = zoneDao.findById(zoneRequest.getId());
+	    	Zone zoneUpdate = zone.get(0);
+	    	Zone zoneBean = CommonUtil.copyBeanProperties(zoneUpdate,Zone.class);
+	      if(Constant.ACTIVE.equals(zoneBean.getStatus())) {
+	    	  zoneBean.setStatus(Constant.DELETED);
+	    	  zoneDao.createOrUpdate(zoneBean);
+	        response.setResponseCode(ErrorCode.SUCCESS);
+	        response.setResponseMessage(Properties.getProperty(ErrorCode.SUCCESS));
+	        return response;
+	      }else {
+	        response.setResponseCode(ErrorCode.STATUS_NOT_ACTIVE);
+	        response.setResponseMessage(Properties.getProperty(ErrorCode.STATUS_NOT_ACTIVE));
+	        return response;
+	      }
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: ZoneHandlerImpl :: deleteZone method", e);
+	      response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(ErrorCode.SYSTEM_ERROR));
+	    }
+	    logger.info("Exiting :: ZoneHandlerImpl :: deleteZone method");
+	    return response;
+	  }
+
+	@Override
+	public ZoneResponse getAllActiveZone() {
+		logger.info("Entering :: ZoneHandlerImpl :: getAllActiveLocations method");
+	ZoneResponse response = new ZoneResponse();
+	try{
+		List<Zone> zone = zoneDao.getAllActiveLocations();
+		if(StringUtil.isListNullNEmpty(zone)) {
+			response.setResponseCode(ErrorCode.ZONE_NOT_FOUND);
+			response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_NOT_FOUND));
+			return response;
+		}
+		List<ZoneRequest> zoneRequests = CommonUtil.copyBeanProperties(zone, ZoneRequest.class);
+		response.setZoneRequest(zoneRequests);
+		response.setResponseCode(ErrorCode.SUCCESS);
+		response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	} catch (Exception e) {
+		logger.error("Error :: ZoneHandlerImpl :: getAllActiveZone method", e);
+		response.setResponseCode(ErrorCode.SYSTEM_ERROR);
+        response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	}
+	logger.info("Exiting :: ZoneHandlerImpl :: getAllActiveZone method");
+	return response;
+	
+	}
+	
+	
+
+}

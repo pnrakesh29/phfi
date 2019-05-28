@@ -1,0 +1,65 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.dao.AdminUserDao;
+import com.chatak.beacon.dao.model.AdminUser;
+import com.chatak.beacon.dao.repository.AdminUserRepository;
+
+/**
+ *
+ * << Add Comments Here >>
+ *
+ * @author Girmiti Software
+ * @date 25-Apr-2015 3:27:50 PM
+ * @version 1.0
+ */
+@Repository("adminUserDao")
+public class AdminUserDaoImpl implements AdminUserDao {
+  
+  @Autowired
+  private AdminUserRepository adminUserRepository;
+
+  @Override
+  public AdminUser authenticateChatakAdminUser(String spUName) throws DataAccessException {
+    try {
+      List<AdminUser> adminUsers = adminUserRepository.findByUserName(spUName);
+      if (null != adminUsers && !adminUsers.isEmpty()) {
+          return adminUsers.get(0);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  @Override
+  public boolean authenticateChatakAdmin(String email, String spPass) throws DataAccessException {
+    // TODO Auto-generated method stub
+    return false;
+  }
+  
+  @Override
+ 	public AdminUser saveOrUpdateAdminUser(AdminUser adminUserDetails) throws DataAccessException {
+ 		return adminUserRepository.save(adminUserDetails);
+ 	}
+  
+  @Override
+	public List<AdminUser> findByUserName(String userName)	throws DataAccessException {
+		return adminUserRepository.findByUserName(userName);
+	}
+
+  @Override
+  public AdminUser findByAdminUserId(Long adminUserId)throws DataAccessException {
+	return adminUserRepository.findOne(adminUserId);
+  }
+  
+  @Override
+	public List<AdminUser> findByUserEmailId(String email)	throws DataAccessException {
+		return adminUserRepository.findByEmail(email);
+	}
+}

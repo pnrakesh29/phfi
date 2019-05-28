@@ -1,0 +1,17 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.model.LocationRequest;
+
+public interface LocationDao {
+
+	public Location createOrUpdateLocation(Location location);
+	
+	public Location findById(Long id);
+	
+	public List<Location> findByLocationName(String locationName);
+	
+	public List<LocationRequest> searchLocation(LocationRequest locationRequest);
+}

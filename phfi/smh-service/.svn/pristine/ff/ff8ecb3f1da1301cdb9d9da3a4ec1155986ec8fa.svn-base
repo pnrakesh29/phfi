@@ -1,0 +1,32 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.State;
+import com.chatak.beacon.model.CountryRequest;
+import com.chatak.beacon.model.StateRequest;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 10-Apr-2015 12:00:28 PM
+ * @version 1.0
+ */
+public interface CountryDao {
+
+	public List<CountryRequest> findAllCountries() throws DataAccessException;
+
+	public List<StateRequest> findAllStates(String status) throws DataAccessException;
+
+	public CountryRequest findCountryByID(Long countryId) throws DataAccessException;
+
+	public StateRequest findStateByID(Long StateId) throws DataAccessException;
+
+	public CountryRequest getCountryByName(String country) throws DataAccessException;
+
+	public List<State> getStateByCountryId(Long id);
+
+}

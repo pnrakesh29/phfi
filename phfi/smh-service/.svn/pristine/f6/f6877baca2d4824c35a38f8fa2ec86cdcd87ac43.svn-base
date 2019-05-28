@@ -1,0 +1,17 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.StylopayFeature;
+
+public interface StylopayFeatureDao {
+
+	public List<StylopayFeature> getFeatureList(String status) throws DataAccessException;
+	
+	public List<Long> getFeatureDataOnRoleIdData(Long roleId) throws DataAccessException;
+	  
+	public List<StylopayFeature> getFeatureOnRoleLevel(String roleLevel, String status) throws DataAccessException;
+
+}

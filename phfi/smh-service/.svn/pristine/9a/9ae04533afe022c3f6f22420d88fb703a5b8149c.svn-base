@@ -1,0 +1,581 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 25-Apr-2015 3:19:51 PM
+ * @version 1.0
+ */
+@Entity
+@Table(name = "ADMIN_USER")
+public class AdminUser implements Serializable {
+
+  /**
+	 * 
+	 */
+  private static final long serialVersionUID = 85715961188781746L;
+
+  @Id
+  @SequenceGenerator(name = "SEQ_PG_ADMIN_USER", sequenceName = "SEQ_PG_ADMIN_USER")
+  @GeneratedValue(generator = "SEQ_PG_ADMIN_USER")
+  @Column(name = "admin_user_id")
+  private Long adminUserId;
+
+  @Column(name = "email")
+  private String email;
+
+  @Column(name = "user_type")
+  private String userType;
+
+  @Column(name = "user_name")
+  private String userName;
+
+  @Column(name = "first_name")
+  private String firstName;
+
+  @Column(name = "last_name")
+  private String lastName;
+
+  @Column(name = "password")
+  private String password;
+
+  @Column(name = "email_token")
+  private String emailToken;
+
+  @Column(name = "email_verified")
+  private Integer emailVerified;
+
+  @Column(name = "language")
+  private String language;
+
+  @Column(name = "address1")
+  private String address1;
+
+  @Column(name = "address2")
+  private String address2;
+
+  @Column(name = "city")
+  private String city;
+
+  @Column(name = "state")
+  private String state;
+
+  @Column(name = "country")
+  private String country;
+
+  @Column(name = "zip")
+  private Long zip;
+
+  @Column(name = "phone")
+  private String phone;
+
+  @Column(name = "last_login")
+  private Timestamp lastLogin;
+
+  @Column(name = "last_login_ip")
+  private String lastLoginIP;
+
+  @Column(name = "previous_passwords")
+  private String previousPasswords;
+
+  @Column(name = "last_password_change")
+  private Timestamp lastPassWordChange;
+
+  @Column(name = "pass_retry_count")
+  private Integer passRetryCount;
+
+  @Column(name = "status")
+  private String status;
+
+  @Column(name = "created_date")
+  private Timestamp createdDate;
+
+  @Column(name = "created_by")
+  private String createdBy;
+
+  @Column(name = "updated_date")
+  private Timestamp updatedDate;
+
+  @Column(name = "updated_by")
+  private String updatedBy;
+
+  @Column(name = "security_question")
+  private String securityQuestion;
+
+  @Column(name = "security_answer")
+  private String securityAnswer;
+
+  @Column(name = "reason")
+  private String reason;
+
+  @Column(name = "service_type")
+  private Integer serviceType;
+  
+  @Column(name = "LOGIN_MODE")
+  private Long loginMode;
+  
+
+public Long getLoginMode() {
+	return loginMode;
+}
+
+public void setLoginMode(Long loginMode) {
+	this.loginMode = loginMode;
+}
+
+/**
+   * @return the adminUserId
+   */
+  public Long getAdminUserId() {
+    return adminUserId;
+  }
+
+  /**
+   * @param adminUserId
+   *          the adminUserId to set
+   */
+  public void setAdminUserId(Long adminUserId) {
+    this.adminUserId = adminUserId;
+  }
+
+  /**
+   * @return the email
+   */
+  public String getEmail() {
+    return email;
+  }
+
+  /**
+   * @param email
+   *          the email to set
+   */
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  /**
+   * @return the userName
+   */
+  public String getUserName() {
+    return userName;
+  }
+
+  /**
+   * @param userName
+   *          the userName to set
+   */
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
+  /**
+   * @return the firstName
+   */
+  public String getFirstName() {
+    return firstName;
+  }
+
+  /**
+   * @param firstName
+   *          the firstName to set
+   */
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  /**
+   * @return the lastName
+   */
+  public String getLastName() {
+    return lastName;
+  }
+
+  /**
+   * @param lastName
+   *          the lastName to set
+   */
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  /**
+   * @return the password
+   */
+  public String getPassword() {
+    return password;
+  }
+
+  /**
+   * @param password
+   *          the password to set
+   */
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  /**
+   * @return the emailToken
+   */
+  public String getEmailToken() {
+    return emailToken;
+  }
+
+  /**
+   * @param emailToken
+   *          the emailToken to set
+   */
+  public void setEmailToken(String emailToken) {
+    this.emailToken = emailToken;
+  }
+
+  /**
+   * @return the emailVerified
+   */
+  public Integer getEmailVerified() {
+    return emailVerified;
+  }
+
+  /**
+   * @param emailVerified
+   *          the emailVerified to set
+   */
+  public void setEmailVerified(Integer emailVerified) {
+    this.emailVerified = emailVerified;
+  }
+
+  /**
+   * @return the language
+   */
+  public String getLanguage() {
+    return language;
+  }
+
+  /**
+   * @param language
+   *          the language to set
+   */
+  public void setLanguage(String language) {
+    this.language = language;
+  }
+
+  /**
+   * @return the address1
+   */
+  public String getAddress1() {
+    return address1;
+  }
+
+  /**
+   * @param address1
+   *          the address1 to set
+   */
+  public void setAddress1(String address1) {
+    this.address1 = address1;
+  }
+
+  /**
+   * @return the address2
+   */
+  public String getAddress2() {
+    return address2;
+  }
+
+  /**
+   * @param address2
+   *          the address2 to set
+   */
+  public void setAddress2(String address2) {
+    this.address2 = address2;
+  }
+
+  /**
+   * @return the city
+   */
+  public String getCity() {
+    return city;
+  }
+
+  /**
+   * @param city
+   *          the city to set
+   */
+  public void setCity(String city) {
+    this.city = city;
+  }
+
+  /**
+   * @return the state
+   */
+  public String getState() {
+    return state;
+  }
+
+  /**
+   * @param state
+   *          the state to set
+   */
+  public void setState(String state) {
+    this.state = state;
+  }
+
+  public String getSecurityQuestion() {
+    return securityQuestion;
+  }
+
+  public final String getReason() {
+    return reason;
+  }
+
+  public final void setReason(String reason) {
+    this.reason = reason;
+  }
+
+  public void setSecurityQuestion(String securityQuestion) {
+    this.securityQuestion = securityQuestion;
+  }
+
+  public String getSecurityAnswer() {
+    return securityAnswer;
+  }
+
+  public void setSecurityAnswer(String securityAnswer) {
+    this.securityAnswer = securityAnswer;
+  }
+
+  /**
+   * @return the country
+   */
+  public String getCountry() {
+    return country;
+  }
+
+  /**
+   * @param country
+   *          the country to set
+   */
+  public void setCountry(String country) {
+    this.country = country;
+  }
+
+  /**
+   * @return the zip
+   */
+  public Long getZip() {
+    return zip;
+  }
+
+  /**
+   * @param zip
+   *          the zip to set
+   */
+  public void setZip(Long zip) {
+    this.zip = zip;
+  }
+
+  /**
+   * @return the phone
+   */
+  public String getPhone() {
+    return phone;
+  }
+
+  /**
+   * @param phone
+   *          the phone to set
+   */
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+  /**
+   * @return the lastLogin
+   */
+  public Timestamp getLastLogin() {
+    return lastLogin;
+  }
+
+  /**
+   * @param lastLogin
+   *          the lastLogin to set
+   */
+  public void setLastLogin(Timestamp lastLogin) {
+    this.lastLogin = lastLogin;
+  }
+
+  /**
+   * @return the lastLoginIP
+   */
+  public String getLastLoginIP() {
+    return lastLoginIP;
+  }
+
+  /**
+   * @param lastLoginIP
+   *          the lastLoginIP to set
+   */
+  public void setLastLoginIP(String lastLoginIP) {
+    this.lastLoginIP = lastLoginIP;
+  }
+
+  /**
+   * @return the previousPasswords
+   */
+  public String getPreviousPasswords() {
+    return previousPasswords;
+  }
+
+  /**
+   * @param previousPasswords
+   *          the previousPasswords to set
+   */
+  public void setPreviousPasswords(String previousPasswords) {
+    this.previousPasswords = previousPasswords;
+  }
+
+  /**
+   * @return the lastPassWordChange
+   */
+  public Timestamp getLastPassWordChange() {
+    return lastPassWordChange;
+  }
+
+  /**
+   * @param lastPassWordChange
+   *          the lastPassWordChange to set
+   */
+  public void setLastPassWordChange(Timestamp lastPassWordChange) {
+    this.lastPassWordChange = lastPassWordChange;
+  }
+
+  /**
+   * @return the passRetryCount
+   */
+  public Integer getPassRetryCount() {
+    return passRetryCount;
+  }
+
+  /**
+   * @param passRetryCount
+   *          the passRetryCount to set
+   */
+  public void setPassRetryCount(Integer passRetryCount) {
+    this.passRetryCount = passRetryCount;
+  }
+
+  /**
+   * @return the status
+   */
+  public String getStatus() {
+    return status;
+  }
+
+  /**
+   * @param status
+   *          the status to set
+   */
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  /**
+   * @return the createdDate
+   */
+  public Timestamp getCreatedDate() {
+    return createdDate;
+  }
+
+  /**
+   * @param createdDate
+   *          the createdDate to set
+   */
+  public void setCreatedDate(Timestamp createdDate) {
+    this.createdDate = createdDate;
+  }
+
+  /**
+   * @return the createdBy
+   */
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  /**
+   * @param createdBy
+   *          the createdBy to set
+   */
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  /**
+   * @return the updatedDate
+   */
+  public Timestamp getUpdatedDate() {
+    return updatedDate;
+  }
+
+  /**
+   * @param updatedDate
+   *          the updatedDate to set
+   */
+  public void setUpdatedDate(Timestamp updatedDate) {
+    this.updatedDate = updatedDate;
+  }
+
+  /**
+   * @return the updatedBy
+   */
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  /**
+   * @param updatedBy
+   *          the updatedBy to set
+   */
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+
+  /**
+   * @return the userType
+   */
+  public String getUserType() {
+    return userType;
+  }
+
+  /**
+   * @param userType
+   *          the userType to set
+   */
+  public void setUserType(String userType) {
+    this.userType = userType;
+  }
+
+  /**
+   * @return the serviceType
+   */
+  public Integer getServiceType() {
+    return serviceType;
+  }
+
+  /**
+   * @param serviceType
+   *          the serviceType to set
+   */
+  public void setServiceType(Integer serviceType) {
+    this.serviceType = serviceType;
+  }
+
+}

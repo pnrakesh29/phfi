@@ -1,0 +1,210 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.ZoneDao;
+import com.chatak.beacon.dao.model.QLocation;
+import com.chatak.beacon.dao.model.QZone;
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.dao.repository.ZoneRepository;
+import com.chatak.beacon.enums.Status;
+import com.chatak.beacon.model.ZoneRequest;
+import com.chatak.beacon.model.ZoneResponse;
+import com.chatak.beacon.util.StringUtil;
+import com.mysema.query.Tuple;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.OrderSpecifier;
+import com.mysema.query.types.expr.BooleanExpression;
+
+@Repository("zoneDao")
+public class ZoneDaoImpl implements ZoneDao {
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	
+	@Autowired
+	private ZoneRepository zoneRepository;
+	
+	@Override
+	public void createOrUpdate(Zone zone) {
+		zoneRepository.save(zone);
+	}
+	@Override
+	public List<Zone> findByZoneName(String zoneName) {	
+		return zoneRepository.findByZoneName(zoneName);
+	}
+	@Override
+	public ZoneResponse searchZone(ZoneRequest zoneRequest) {
+		ZoneResponse zoneResponse =new ZoneResponse();
+	    int startIndex = 0;
+	    int endIndex = 0;
+	    Integer totalRecords = zoneRequest.getNoOfRecords();
+
+	    if(zoneRequest.getPageIndex() == null || zoneRequest.getPageIndex() == 1) {
+	      totalRecords = getTotalNumberOfRecords(zoneRequest);
+	      zoneRequest.setNoOfRecords(totalRecords);
+	    }
+
+	    if(zoneRequest.getPageIndex() == null && zoneRequest.getPageSize() == null) {
+	      startIndex = 0;
+	      endIndex = Constant.DEFAULT_PAGE_SIZE;
+	    }
+	    else {
+	      startIndex = (zoneRequest.getPageIndex() - 1) * zoneRequest.getPageSize();
+	      endIndex = startIndex + zoneRequest.getPageSize();
+	    }
+	    List<ZoneRequest> zoneList = new ArrayList<ZoneRequest>();
+	    QZone qZone = QZone.zone;
+	    QLocation location = QLocation.location;
+	    JPAQuery query = new JPAQuery(entityManager);
+<<<<<<< .mine
+	    List<Tuple> list = query
+		        .from(QZone.zone,location)
+		        .where(isIdEq(zoneRequest.getId()),
+		        QZone.zone.locationId.eq(location.id),
+		        location.status.ne(Status.Deleted.name()),isNameEq(zoneRequest.getZoneName()),isSubTypeEq(zoneRequest.getType()),isTypeEq(zoneRequest.getSubType()))
+		        .offset(startIndex).limit(endIndex).orderBy(orderByIdDesc())
+		        .list(QZone.zone.id,QZone.zone.locationId,QZone.zone.zoneName,
+		            location.locationName,QZone.zone.longitude,QZone.zone.lattitude,QZone.zone.type,QZone.zone.subType,
+		            QZone.zone.geofence,QZone.zone.radius,QZone.zone.status,location.locationName);
+=======
+		List<Tuple> list = query
+				.from(qZone, location)
+				.where(isIdEq(zoneRequest.getId()),
+						isZoneNameEq(zoneRequest.getZoneName()),
+						isLocationIdEq(zoneRequest.getLocationId()),
+						isTypeEq(zoneRequest.getType()),
+						isSubTypeEq(zoneRequest.getSubType()),
+						isZoneStatusEq(zoneRequest.getStatus()),
+						qZone.locationId.eq(location.id))
+				.offset(startIndex)
+				.limit(endIndex)
+				.orderBy(orderByIdDesc())
+				.list(qZone.id, QZone.zone.locationId,
+						qZone.zoneName, location.locationName,
+						qZone.longitude, qZone.lattitude,
+						qZone.type, qZone.subType,
+						qZone.geofence, qZone.radius,
+						qZone.status);
+>>>>>>> .r278
+	  for (Tuple tuple : list) {
+		  ZoneRequest zoneReq = new ZoneRequest();
+		  zoneReq.setId(tuple.get(QZone.zone.id));
+		  zoneReq.setLocationId(tuple.get(QZone.zone.locationId));
+		  zoneReq.setZoneName(tuple.get(QZone.zone.zoneName));
+		  zoneReq.setGeofence(tuple.get(QZone.zone.geofence));
+		  zoneReq.setLongitude(tuple.get(QZone.zone.longitude));
+		  zoneReq.setLattitude(tuple.get(QZone.zone.lattitude));
+		  zoneReq.setRadius(tuple.get(QZone.zone.radius));
+		  zoneReq.setType(tuple.get(QZone.zone.type));
+		  zoneReq.setSubType(tuple.get(QZone.zone.subType));
+		  zoneReq.setStatus(tuple.get(QZone.zone.status));
+		  zoneReq.setLocationName(tuple.get(location.locationName));
+		  zoneList.add(zoneReq);
+	    }
+	  zoneResponse.setZoneRequest(zoneList);
+	  return zoneResponse;
+	  
+	}
+
+	private int getTotalNumberOfRecords(ZoneRequest zoneRequest) {
+		JPAQuery query = new JPAQuery(entityManager);
+		QZone qZone = QZone.zone;
+		QLocation location = QLocation.location;
+		List<Long> list = query
+				.from(qZone, location)
+				.where(isIdEq(zoneRequest.getId()),
+						isZoneNameEq(zoneRequest.getZoneName()),
+						isLocationIdEq(zoneRequest.getLocationId()),
+						isTypeEq(zoneRequest.getType()),
+						isSubTypeEq(zoneRequest.getSubType()),
+						isZoneStatusEq(zoneRequest.getStatus()),
+						qZone.locationId.eq(location.id)).list(qZone.id);
+		return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+	}
+
+	private BooleanExpression isIdEq(Long id) {
+		return (id != null && !"".equals(id)) ? QZone.zone.id.eq(id) : null;
+	}
+
+	private BooleanExpression isLocationIdEq(Long locationId) {
+		return (locationId != null && !"".equals(locationId)) ? QZone.zone.locationId.eq(locationId) : null;
+	}
+
+	private BooleanExpression isZoneNameEq(String zoneName) {
+		return (zoneName != null && !"".equals(zoneName)) ? QZone.zone.zoneName.toUpperCase().like("%" + zoneName.toUpperCase().replace("*", "") + "%") : null;
+	}
+
+	private BooleanExpression isTypeEq(String type) {
+		return (type != null && !"".equals(type)) ? QZone.zone.type.toUpperCase().like("%" + type.toUpperCase().replace("*", "") + "%") : null;
+	}
+
+	private BooleanExpression isSubTypeEq(String subType) {
+		return (subType != null && !"".equals(subType)) ? QZone.zone.subType.toUpperCase().like("%" + subType.toUpperCase().replace("*", "") + "%") : null;
+	}
+
+	private BooleanExpression isZoneStatusEq(String status) {
+		return (status != null && !"".equals(status)) ? QZone.zone.status.eq(status) : null;
+	}
+	@Override
+	public List<Zone> findById(Long id) {
+		return zoneRepository.findById(id);
+	}
+	@Override
+	public List<ZoneRequest> getAllActiveLocations() {
+		return zoneRepository.findByStatus(Constant.ACTIVE.toString());
+	}
+	
+	@Override
+	public ZoneResponse findZoneDetatils(ZoneRequest zoneRequest) {
+		ZoneResponse zoneResponse = new ZoneResponse();
+		List<ZoneRequest> zoneList = new ArrayList<ZoneRequest>();
+		QZone qZone = QZone.zone;
+		QLocation location = QLocation.location;
+		JPAQuery query = new JPAQuery(entityManager);
+		List<Tuple> list = query
+				.from(qZone, location)
+				.where(isIdEq(zoneRequest.getId()),
+						QZone.zone.locationId.eq(location.id),
+						location.status.ne(Status.Deleted.name()))
+				.list(qZone.id, qZone.locationId,
+						qZone.zoneName, location.locationName,
+						qZone.longitude, qZone.lattitude,
+						qZone.type, qZone.subType,
+						qZone.geofence, qZone.radius,
+						qZone.status);
+		for (Tuple tuple : list) {
+			ZoneRequest zoneReq = new ZoneRequest();
+			zoneReq.setId(tuple.get(QZone.zone.id));
+			zoneReq.setLocationId(tuple.get(QZone.zone.locationId));
+			zoneReq.setZoneName(tuple.get(QZone.zone.zoneName));
+			zoneReq.setGeofence(tuple.get(QZone.zone.geofence));
+			zoneReq.setLongitude(tuple.get(QZone.zone.longitude));
+			zoneReq.setLattitude(tuple.get(QZone.zone.lattitude));
+			zoneReq.setRadius(tuple.get(QZone.zone.radius));
+			zoneReq.setType(tuple.get(QZone.zone.type));
+			zoneReq.setSubType(tuple.get(QZone.zone.subType));
+			zoneReq.setStatus(tuple.get(QZone.zone.status));
+			zoneReq.setLocationName(tuple.get(location.locationName));
+			zoneList.add(zoneReq);
+		}
+		zoneResponse.setZoneRequest(zoneList);
+		return zoneResponse;
+	}
+
+	private OrderSpecifier<?> orderByIdDesc() {
+		
+		return  QZone.zone.createdDate.desc();
+	}
+	
+
+}

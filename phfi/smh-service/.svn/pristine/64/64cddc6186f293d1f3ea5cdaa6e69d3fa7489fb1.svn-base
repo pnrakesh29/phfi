@@ -1,0 +1,20 @@
+package com.chatak.beacon.dao.repository;
+
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+
+import com.chatak.beacon.dao.model.Beacon;
+
+public interface BeaconRepository extends JpaRepository<Beacon, Long>, QueryDslPredicateExecutor<Beacon> {
+	
+	public Beacon findById(String id);
+	
+	public List<Beacon> findByBeaconId(String beaconId);
+	
+	public List<Beacon> findByBeaconName(String beaconName);
+	
+	public List<Beacon> findByStatus(String status);
+}

@@ -1,0 +1,23 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneRequest;
+import com.chatak.beacon.model.ZoneResponse;
+
+public interface ZoneHandler {
+
+	Response createOrUpdateZone(ZoneRequest zoneManagementRequest);
+
+	ZoneResponse searchZone(ZoneRequest zoneManagementRequest);
+
+	ZoneResponse findZoneById(ZoneRequest zoneManagementRequest);
+
+	Response deleteZone(ZoneRequest zoneManagementRequest);
+
+	ZoneResponse getAllActiveZone();
+
+	Response changeZoneStatus(ZoneRequest zoneRequest);
+
+	
+
+}

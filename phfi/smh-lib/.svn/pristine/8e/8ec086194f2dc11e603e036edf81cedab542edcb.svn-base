@@ -1,0 +1,26 @@
+package com.chatak.beacon.model;
+
+import java.util.List;
+
+public class ZoneManagementResponse extends Response{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5281535109113969869L;
+
+	
+	private List<ZoneManagementRequest> zoneManagementRequest;
+
+	public List<ZoneManagementRequest> getZoneManagementRequest() {
+		return zoneManagementRequest;
+	}
+
+	public void setZoneManagementRequest(
+			List<ZoneManagementRequest> zoneManagementRequest) {
+		this.zoneManagementRequest = zoneManagementRequest;
+	}
+
+	
+	
+}

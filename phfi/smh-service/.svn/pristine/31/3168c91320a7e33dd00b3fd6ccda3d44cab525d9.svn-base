@@ -1,0 +1,26 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import com.chatak.beacon.dao.model.Beacon;
+import com.chatak.beacon.model.BeaconRequest;
+
+/**
+ *
+ * << Add Comments Here >>
+ *
+ * @author Girmiti Software
+ * @date 16-Nov-2015 1:05:11 PM
+ * @version 1.0
+ */
+public interface BeaconDao {
+
+	public Beacon createOrUpdateBeacon(Beacon beaconRequest);
+
+	public List<Beacon> findByBeaconName(String beaconName);
+
+	public Beacon findById(Long id);
+
+	List<BeaconRequest> searchBeaconProfiles(BeaconRequest beaconRequest);
+
+}

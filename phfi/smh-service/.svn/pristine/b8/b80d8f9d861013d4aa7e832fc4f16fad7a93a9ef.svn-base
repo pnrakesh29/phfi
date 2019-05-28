@@ -1,0 +1,53 @@
+package com.chatak.beacon.dao.model;
+
+import static com.mysema.query.types.PathMetadataFactory.*;
+
+import com.mysema.query.types.path.*;
+
+import com.mysema.query.types.PathMetadata;
+import javax.annotation.Generated;
+import com.mysema.query.types.Path;
+
+
+/**
+ * QZoneManagement is a Querydsl query type for ZoneManagement
+ */
+@Generated("com.mysema.query.codegen.EntitySerializer")
+public class QZoneManagement extends EntityPathBase<ZoneManagement> {
+
+    private static final long serialVersionUID = -960777605L;
+
+    public static final QZoneManagement zoneManagement = new QZoneManagement("zoneManagement");
+
+    public final StringPath address1 = createString("address1");
+
+    public final StringPath address2 = createString("address2");
+
+    public final StringPath city = createString("city");
+
+    public final StringPath country = createString("country");
+
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final StringPath state = createString("state");
+
+    public final StringPath status = createString("status");
+
+    public final StringPath zip = createString("zip");
+
+    public final StringPath zoneId = createString("zoneId");
+
+    public QZoneManagement(String variable) {
+        super(ZoneManagement.class, forVariable(variable));
+    }
+
+    public QZoneManagement(Path<? extends ZoneManagement> path) {
+        super(path.getType(), path.getMetadata());
+    }
+
+    public QZoneManagement(PathMetadata<?> metadata) {
+        super(ZoneManagement.class, metadata);
+    }
+
+}
+

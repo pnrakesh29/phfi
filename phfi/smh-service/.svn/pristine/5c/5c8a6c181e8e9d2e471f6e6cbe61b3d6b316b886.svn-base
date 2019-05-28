@@ -1,0 +1,118 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.LocationDao;
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.dao.model.QLocation;
+import com.chatak.beacon.dao.repository.LocationRepository;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.util.StringUtil;
+import com.mysema.query.Tuple;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.expr.BooleanExpression;
+
+@Repository("locationDao")
+public class LocationDaoImpl implements LocationDao {
+
+	@PersistenceContext
+	private EntityManager entityManager;
+	
+	@Autowired
+	private LocationRepository locationRepository;
+	
+	@Override
+	public Location createOrUpdateLocation(Location location) {
+		return locationRepository.save(location);
+	}
+
+	@Override
+	public Location findById(Long id) {
+		return locationRepository.findById(id);
+	}
+
+	@Override
+	public List<Location> findByLocationName(String locationName) {
+		return locationRepository.findByLocationName(locationName);
+	}
+
+	@Override
+	public List<LocationRequest> searchLocation(LocationRequest locationRequest) {
+		List<LocationRequest> locationRequests = new ArrayList<LocationRequest>();
+		int startIndex = 0;
+        int endIndex = 0;
+        Integer totalRecords = locationRequest.getNoOfRecords();
+        
+        if(locationRequest.getPageIndex() == null || locationRequest.getPageIndex() == 1){
+            totalRecords = getTotalNumberOfRecords(locationRequest);
+            locationRequest.setNoOfRecords(totalRecords);
+        }
+        
+        if(locationRequest.getPageIndex() == null && locationRequest.getPageSize() == null){
+        	startIndex = 0;
+        	endIndex = Constant.DEFAULT_PAGE_SIZE;
+        } else {
+        	startIndex = (locationRequest.getPageIndex()-1) * locationRequest.getPageSize();
+            endIndex = startIndex + locationRequest.getPageSize();
+        }
+		JPAQuery query = new JPAQuery(entityManager);
+		
+		List<Tuple> tupleList = query.from(QLocation.location)
+				               .where(isLocationNameEq(locationRequest.getLocationName()),
+				            		   isServiceProviderEq(locationRequest.getServiceProvider()),
+				            		   isLocationIdEq(locationRequest.getLocationId()))
+						             .offset(startIndex)
+						             .limit(endIndex)
+						             .orderBy(QLocation.location.createdDate.desc())
+				.list(QLocation.location.id, QLocation.location.locationId,
+						QLocation.location.locationName, QLocation.location.locationInfo,
+						QLocation.location.serviceProvider, QLocation.location.address1, 
+						QLocation.location.address2, QLocation.location.city, 
+						QLocation.location.state, QLocation.location.country,
+						QLocation.location.zip, QLocation.location.status);
+		for (Tuple tuple : tupleList) {
+			LocationRequest location = new LocationRequest();
+			location.setId(tuple.get(QLocation.location.id));
+			location.setLocationId(tuple.get(QLocation.location.locationId));
+			location.setLocationInfo(tuple.get(QLocation.location.locationInfo));
+			location.setServiceProvider(tuple.get(QLocation.location.serviceProvider));
+			location.setAddress1(tuple.get(QLocation.location.address1));
+			location.setAddress2(tuple.get(QLocation.location.address2));
+			location.setCity(tuple.get(QLocation.location.city));
+			location.setState(tuple.get(QLocation.location.state));
+			location.setCountry(tuple.get(QLocation.location.country));
+			location.setZip(tuple.get(QLocation.location.zip));
+			location.setStatus(tuple.get(QLocation.location.status));
+			locationRequests.add(location);
+		}
+		return locationRequests;
+	}
+
+	private int getTotalNumberOfRecords(LocationRequest locationRequest){
+		JPAQuery query = new JPAQuery(entityManager);
+		List<Long> list = query.from(QLocation.location)
+						.where(isLocationNameEq(locationRequest.getLocationName()))
+					   .list(QLocation.location.id);
+		return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+	}
+	
+	private BooleanExpression isLocationNameEq(String locationName){
+	    return (locationName != null && !"".equals(locationName)) ? QLocation.location.locationName.toUpperCase().like( "%" + locationName.toUpperCase().replace("*", "") + "%") : null;
+	}
+	
+	private BooleanExpression isServiceProviderEq(String serviceProvider){
+	    return (serviceProvider != null && !"".equals(serviceProvider)) ? QLocation.location.serviceProvider.toUpperCase().like( "%" + serviceProvider.toUpperCase().replace("*", "") + "%") : null;
+	}
+	
+	private BooleanExpression isLocationIdEq(String locationId){
+	    return (locationId != null && !"".equals(locationId)) ? QLocation.location.locationId.toUpperCase().like( "%" + locationId.toUpperCase().replace("*", "") + "%") : null;
+	}
+}

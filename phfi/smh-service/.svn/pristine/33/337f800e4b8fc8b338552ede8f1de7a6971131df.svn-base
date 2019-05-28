@@ -1,0 +1,278 @@
+package com.chatak.beacon.handler.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.BeaconErrorCodes;
+import com.chatak.beacon.dao.LocationDao;
+import com.chatak.beacon.dao.ZoneDao;
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.enums.Status;
+import com.chatak.beacon.handler.ZoneHandler;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneRequest;
+import com.chatak.beacon.model.ZoneResponse;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+@Service("zoneHandler")
+public class ZoneHandlerImpl implements ZoneHandler{
+	
+	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	@Autowired
+	private ZoneDao zoneDao;
+	
+	@Autowired
+	private LocationDao locationDao;
+	
+	@Override
+	public Response createOrUpdateZone(ZoneRequest zoneRequest) {
+		 logger.info("Entering:: ZoneServiceHandlerImpl:: createOrUpdateZone method");
+		Response response = new Response();
+		try{
+			List<Zone> zones = zoneDao.findByZoneName(zoneRequest.getZoneName().trim());
+			Location location = locationDao.findById(zoneRequest.getLocationId());
+			if(!Constant.ACTIVE.equalsIgnoreCase(location.getStatus())){
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			if(null != zoneRequest.getId()){
+				response.setResponseMessageExt(Constant.UPDATE);
+				Zone zoneFromDB = zoneDao.findById(zoneRequest.getId());
+				if (!Constant.ACTIVE.equalsIgnoreCase(zoneFromDB.getStatus())) {
+					response.setResponseCode(BeaconErrorCodes.ZONE_STATUS_NOT_ACTIVE);
+					response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+					return response;
+				}
+				Boolean zoneNameExist = Boolean.FALSE;
+				if(StringUtil.isListNotNullNEmpty(zones)){
+					for(Zone zone : zones){
+						if (zone.getId().compareTo(zoneFromDB.getId()) != 0) {
+							zoneNameExist = Boolean.TRUE;
+							break;
+						}
+					}
+				}
+				if (zoneNameExist) {
+					response.setResponseCode(BeaconErrorCodes.ZONE_NAME_ALREADY_EXIST);
+					response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+					return response;
+				}
+				Zone zoneUpdate = CommonUtil.copyBeanProperties(zoneFromDB, Zone.class);
+				Zone zoneData = updateZoneDetails(zoneUpdate,zoneRequest);
+				zoneDao.createOrUpdate(zoneData);
+				response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		   	    return response;
+			}
+			response.setResponseMessageExt(Constant.CREATE);
+			if(StringUtil.isListNotNullNEmpty(zones)){
+				response.setResponseCode(BeaconErrorCodes.ZONE_NAME_ALREADY_EXIST);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			    return response;
+			}
+			Zone createZone = createZoneData(zoneRequest);
+			zoneDao.createOrUpdate(createZone);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}catch(DataAccessException e) {
+   	      logger.error("Error :: ZoneServiceHandlerImpl :: createOrUpdateZone method", e);
+   	      response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+   	    }
+   	    catch(Exception e) {
+   	      logger.error("Error :: ZoneServiceHandlerImpl :: createOrUpdateZone method", e);
+   	   response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+	      response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+   	    }
+		return response;
+	}
+
+	private Zone createZoneData(ZoneRequest zoneRequest) {
+		Zone zone = new Zone();
+		zone.setZoneName(zoneRequest.getZoneName());
+		zone.setLattitude(zoneRequest.getLattitude());
+		zone.setLongitude(zoneRequest.getLattitude());
+		zone.setGeofence(zoneRequest.getGeofence());
+		zone.setLocationId(zoneRequest.getLocationId());
+		zone.setRadius(zoneRequest.getRadius());
+		zone.setType(zoneRequest.getType());
+		zone.setSubType(zoneRequest.getSubType());
+		zone.setCreatedBy("ADMIN");
+		zone.setCreatedDate(DateUtil.getCurrentTimestamp());
+		zone.setStatus(Status.Active.toString());
+		return zone;
+	}
+	private Zone updateZoneDetails(Zone zone,ZoneRequest zoneRequest) {
+		zone.setId(zone.getId());
+		zone.setZoneName(zoneRequest.getZoneName());
+		zone.setLattitude(zoneRequest.getLattitude());
+		zone.setLongitude(zoneRequest.getLattitude());
+		zone.setGeofence(zoneRequest.getGeofence());
+		zone.setLocationId(zoneRequest.getLocationId());
+		zone.setRadius(zoneRequest.getRadius());
+		zone.setType(zoneRequest.getType());
+		zone.setSubType(zoneRequest.getSubType());
+		zone.setUpdatedBy("ADMIN");
+		zone.setUpdatedDate(DateUtil.getCurrentTimestamp());
+		return zone;
+	}
+
+	@Override
+	public ZoneResponse searchZone(ZoneRequest zoneRequest) {
+		 logger.info("Entering :: ZoneHandlerImpl :: searchZone method");
+		 ZoneResponse zoneResponse = new ZoneResponse();
+		    List<ZoneRequest> zoneRequests = new ArrayList<ZoneRequest>();
+		    try {
+		    	 zoneResponse = zoneDao.searchZone(zoneRequest);
+		      if(StringUtil.isListNotNullNEmpty(zoneResponse.getResponseList())) {
+		        zoneRequests = CommonUtil.copyListBeanProperty(zoneResponse.getResponseList(), ZoneRequest.class);
+		    	  zoneResponse.setZoneRequest(zoneRequests);
+		      }
+		      zoneResponse.setNoOfRecords(zoneRequest.getNoOfRecords());
+		      zoneResponse.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+		      zoneResponse.setResponseMessage(Properties.getProperty(zoneResponse.getResponseCode()));
+		    }
+		    catch(Exception e) {
+		      logger.error("Error :: ZoneHandlerImpl :: searchZone method", e);
+		      zoneResponse.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+		      zoneResponse.setResponseMessage(Properties.getProperty(zoneResponse.getResponseCode()));
+		    }
+		    logger.info("Exiting :: ZoneHandlerImpl :: searchZone method");
+
+		    return zoneResponse;
+	}
+
+	@Override
+	public ZoneResponse findZoneById(ZoneRequest zoneRequest) {
+	    logger.info("Entering :: ZoneHandlerImpl :: findServiceProviderById method");
+	    ZoneResponse response = new ZoneResponse();
+	    List<ZoneRequest> responseList = new ArrayList<ZoneRequest>();
+	    try {
+	    	ZoneResponse zoneResponse = zoneDao.findZoneDetatils(zoneRequest);
+	      if(zoneResponse == null) {
+	        response.setResponseCode(BeaconErrorCodes.ZONE_NOT_FOUND);
+	        response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	        return response;
+	      }
+	      ZoneRequest zoneData = CommonUtil.copyBeanProperties(zoneResponse.getZoneRequest().get(0),ZoneRequest.class);
+	      responseList.add(zoneData);
+	      response.setZoneRequest(responseList);
+	      response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+	      response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: ServiceProviderServiceImpl :: findServiceProviderById method", e);
+	      response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	    }
+	    logger.info("Exiting :: ServiceProviderServiceImpl :: findServiceProviderById method");
+
+	    return response;
+	  }
+
+	@Override
+	public Response deleteZone(ZoneRequest zoneRequest) {
+	    logger.info("Entering :: ServiceProviderServiceImpl :: deleteZone method");
+	    ZoneResponse response = new ZoneResponse();
+	    try {
+	    	Zone zone = zoneDao.findById(zoneRequest.getId());
+	      if(Constant.ACTIVE.equals(zone.getStatus())) {
+	    	  zone.setStatus(Constant.DELETED);
+	    	  zone.setUpdatedBy(Constant.CREATED_BY);
+	    	  zone.setUpdatedDate(DateUtil.getCurrentTimestamp());
+	    	  zoneDao.createOrUpdate(zone);
+	    	  response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			  response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	        return response;
+	      }else {
+	        response.setResponseCode(BeaconErrorCodes.ZONE_STATUS_NOT_ACTIVE);
+	        response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	        return response;
+	      }
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: ZoneHandlerImpl :: deleteZone method", e);
+	      response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	    }
+	    logger.info("Exiting :: ZoneHandlerImpl :: deleteZone method");
+	    return response;
+	  }
+
+	@Override
+	public ZoneResponse getAllActiveZone() {
+		logger.info("Entering :: ZoneHandlerImpl :: getAllActiveLocations method");
+	ZoneResponse response = new ZoneResponse();
+	try{
+		List<ZoneRequest> zoneRequests = zoneDao.getAllActiveLocations();
+		if(StringUtil.isListNullNEmpty(zoneRequests)) {
+			response.setResponseCode(BeaconErrorCodes.ZONE_NOT_FOUND);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			return response;
+		}
+	//	List<ZoneRequest> zoneRequests = CommonUtil.copyBeanProperties(zone, ZoneRequest.class);
+		response.setZoneRequest(zoneRequests);
+		response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+		response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	} catch (Exception e) {
+		logger.error("Error :: ZoneHandlerImpl :: getAllActiveZone method", e);
+		response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+        response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	}
+	logger.info("Exiting :: ZoneHandlerImpl :: getAllActiveZone method");
+	return response;
+	
+	}
+
+	@Override
+	public Response changeZoneStatus(ZoneRequest zoneRequest) {
+		logger.info("Entering :: ServiceProviderServiceImpl :: deleteZone method");
+	    ZoneResponse response = new ZoneResponse();
+	    try {
+	    	Zone zone = zoneDao.findById(zoneRequest.getId());
+	      if(Constant.ACTIVE.equals(zone.getStatus())) {
+	    	  zone.setStatus(zoneRequest.getStatus());
+	    	  zone.setReason(zoneRequest.getReason());
+	    	  zone.setUpdatedBy(Constant.CREATED_BY);
+	    	  zone.setUpdatedDate(DateUtil.getCurrentTimestamp());
+	    	  zoneDao.createOrUpdate(zone);
+	    	  response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			  response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	        return response;
+	      }else if(Constant.SUSPENDED.equals(zone.getStatus().trim())){
+	    	  zone.setStatus(zoneRequest.getStatus());
+	    	  zone.setReason(zoneRequest.getReason());
+	    	  zoneDao.createOrUpdate(zone);
+	    	  response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			  response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	        return response;
+	      }else{
+	        response.setResponseCode(BeaconErrorCodes.ZONE_STATUS_NOT_ACTIVE);
+	        response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	        return response;
+	      }
+	    }catch(Exception e) {
+	      logger.error("Error :: ZoneHandlerImpl :: deleteZone method", e);
+	      response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+   	      response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+	    }
+	    logger.info("Exiting :: ZoneHandlerImpl :: deleteZone method");
+	    return response;
+	}
+	
+	
+
+}

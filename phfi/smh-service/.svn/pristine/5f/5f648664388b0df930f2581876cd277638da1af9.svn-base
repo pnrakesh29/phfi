@@ -1,0 +1,516 @@
+package com.chatak.beacon.handler.impl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.RolesServiceProviderMappingDao;
+import com.chatak.beacon.dao.BeaconFeatureDao;
+import com.chatak.beacon.dao.UserRoleDao;
+import com.chatak.beacon.dao.UserRoleEntityMapDao;
+import com.chatak.beacon.dao.UserRoleFeatureMapDao;
+import com.chatak.beacon.dao.model.BeaconFeature;
+import com.chatak.beacon.dao.model.UserRole;
+import com.chatak.beacon.dao.model.UserRoleEntityMap;
+import com.chatak.beacon.dao.model.UserRoleFeatureMap;
+import com.chatak.beacon.enums.RoleLevel;
+import com.chatak.beacon.exception.BeaconServiceException;
+import com.chatak.beacon.handler.RoleServiceHandler;
+import com.chatak.beacon.model.EditRoleResponse;
+import com.chatak.beacon.model.GetRolesOnUserTypeRequest;
+import com.chatak.beacon.model.GetRolesOnUserTypeResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.RoleFeatureResponse;
+import com.chatak.beacon.model.RoleLevelFeatureRequest;
+import com.chatak.beacon.model.BeaconFeatureRequest;
+import com.chatak.beacon.model.UserRoleRequest;
+import com.chatak.beacon.model.UserRoleResponse;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.MapUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+@Service("roleServiceHandler")
+public class RoleServiceHandlerImpl implements RoleServiceHandler {
+	
+
+	
+	private Logger logger = LogManager.getLogger(this.getClass());
+
+	
+	@Autowired
+	private UserRoleFeatureMapDao userRoleFeatureMapDao;
+	
+	@Autowired
+	private BeaconFeatureDao stylopayFeatureDao;
+	
+	@Autowired
+	private UserRoleDao userRoleDao;
+	
+	@Autowired
+	private UserRoleEntityMapDao userRoleEntityMapDao;
+	
+	@Autowired
+	private RolesServiceProviderMappingDao roleServiceMappingDao;
+	
+	 
+	@Override
+	@Transactional(rollbackFor=BeaconServiceException.class)
+	public Response createOrUpdateRole(UserRoleRequest userRoleRequest) throws BeaconServiceException {
+    logger.info("Entering:: AdminRoleHandlerImpl:: addOrUpdateRole method");
+    Response responseErrorData = new Response();
+    UserRole userRoles = new UserRole();
+    try {
+    	List<UserRole> roleData = userRoleDao.findByRoleName(userRoleRequest.getRoleName());
+    	if (userRoleRequest.getUpdateCheckFlage()== null){
+    		if(StringUtil.isListNotNullNEmpty(roleData)){
+    			for(int i=0;i<roleData.size();i++){
+    				UserRoleEntityMap userRoleEntityMap=userRoleEntityMapDao.findByUserRoleId(roleData.get(i).getUser_role_id());
+    					if(userRoleEntityMap.getTokenId()==null && userRoleEntityMap.getHceId()==null && userRoleEntityMap.getSptsmId() ==null  && userRoleRequest.getUserRoleEntityMapRequest().getHceId()==null && userRoleRequest.getUserRoleEntityMapRequest().getSptsmId()==null && userRoleRequest.getUserRoleEntityMapRequest().getTokenId()==null){
+    						responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_111);
+    						responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_111));
+   	       	            	logger.info("Exiting:: AdminRoleHandlerImpl:: RoleNameExist:: addOrUpdateRole method");
+   	       	         	    return responseErrorData;
+    				} else {
+    					if(userRoleRequest.getUserRoleEntityMapRequest().getTokenId() != null && userRoleEntityMap.getTokenId() != null) {
+    						if(userRoleRequest.getUserRoleEntityMapRequest().getTokenId().equals(userRoleEntityMap.getTokenId())) {
+    							responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_111);
+        						responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_111));
+           	       	      		logger.info("Exiting:: AdminRoleHandlerImpl:: RoleNameExist:: addOrUpdateRole method");
+           	       	      		return responseErrorData;
+    						}
+    					} else {
+    						if(userRoleRequest.getUserRoleEntityMapRequest().getSptsmId()!=null && userRoleEntityMap.getSptsmId()!=null){
+    						     if(userRoleRequest.getUserRoleEntityMapRequest().getSptsmId().equals(userRoleEntityMap.getSptsmId())) {
+    						    	 responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_111);
+    	        					 responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_111));
+    	           	       	         logger.info("Exiting:: AdminRoleHandlerImpl:: RoleNameExist:: addOrUpdateRole method");
+    	           	       	         return responseErrorData; 
+    						     }
+    						} else {
+    							if(userRoleRequest.getUserRoleEntityMapRequest().getHceId()!=null && userRoleEntityMap.getHceId()!=null){
+    								if(userRoleRequest.getUserRoleEntityMapRequest().getHceId().equals(userRoleEntityMap.getHceId())){
+    									 responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_111);
+        	        					 responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+        	        					 logger.info("Exiting:: AdminRoleHandlerImpl:: RoleNameExist:: addOrUpdateRole method");
+        	        					 return responseErrorData; 
+    								}
+    							} 
+							}
+						}
+					}
+				}
+			}
+		}
+    	
+    	UserRole createUserRole = CommonUtil.copyBeanProperties(userRoleRequest, UserRole.class);
+    	if (userRoleRequest.getRoleId() == null) {
+    		createUserRole.setRole_type(String.valueOf(userRoleRequest.getRoleType()));
+    		createUserRole.setStatus(Constant.ACTIVE);
+    		createUserRole.setName(userRoleRequest.getRoleName());
+    		createUserRole.setCreatedDate(DateUtil.getCurrentTimestamp());
+    		}
+    		
+    		if (userRoleRequest.getRoleId() !=null) {
+    			UserRole userRole = userRoleDao.findByUserRoleId(Long.valueOf(userRoleRequest.getRoleId()));
+      	
+      		if (userRoleRequest.getStatus() == null) {
+      			userRoleRequest.setStatus(userRole.getStatus());
+      			userRoleRequest.setReason(userRole.getReason());
+        }
+      		else if(!(userRole.getStatus().equals(Constant.ACTIVE))){
+      			responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_125);
+      			responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_125));
+				  return responseErrorData;
+      		}
+      		createUserRole.setStatus(userRoleRequest.getStatus());
+      		createUserRole.setName(userRoleRequest.getRoleName());
+      		createUserRole.setDescription(userRoleRequest.getDescription());
+      		createUserRole.setRole_type(userRole.getRole_type());
+      		createUserRole.setUpdated_Date(DateUtil.getCurrentTimestamp());
+      		createUserRole.setUser_role_id(Long.valueOf(userRoleRequest.getRoleId()));
+    	}
+    		logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdate ::addOrUpdateRole");
+    		userRoles =  userRoleDao.saveOrUpdateUserRole(createUserRole);
+      		if(userRoles.getUser_role_id() == null)
+      			throw new BeaconServiceException(Properties.getProperty("prepaid.role.error.message"));
+      
+      		if(userRoleRequest.getRoleId()== null && !StringUtil.isNull(userRoleRequest.getUserRoleEntityMapRequest())){
+      			UserRoleEntityMap userRoleEntityMap = CommonUtil.copyBeanProperties(userRoleRequest.getUserRoleEntityMapRequest(), UserRoleEntityMap.class);
+      			userRoleEntityMap.setUserRoleId(userRoles.getUser_role_id());
+      			logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdateUserRoleEntityMap:: addOrUpdateRole");
+          		userRoleEntityMap =  userRoleDao.saveOrUpdateUserRoleEntityMap(userRoleEntityMap);
+      		}
+      		
+      		if(userRoleRequest.getFeature() != null) {
+      			for(String featureData : userRoleRequest.getFeature()) {
+      				UserRoleFeatureMap featureMap = new UserRoleFeatureMap();
+      					featureMap.setRoleId(userRoles.getUser_role_id());
+						featureMap.setFeatureId(Long.valueOf(featureData));
+      					featureMap.setCreatedBy(userRoleRequest.getCreatedBy());
+      					featureMap.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+      					logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdateUserRoleEntityMap:: addOrUpdateRole");
+      					userRoleFeatureMapDao.saveOrUpdateUserRoleFeatureMap(featureMap);
+      					logger.info("Saving:: AdminRoleHandlerImpl:: FeaturesIn PortalRoleFeatureMap:: addOrUpdateRole method");
+      			}
+      		}
+      		
+      		if (userRoleRequest.getRoleId() != null && userRoleRequest.getFeature() != null) {
+      			logger.info(" AdminRoleHandlerImpl:: Before deleteUserRoleFeatureMap:: addOrUpdateRole");
+      			userRoleFeatureMapDao.deleteUserRoleFeatureMap(Long.valueOf(userRoleRequest.getRoleId()));
+      			if(userRoleRequest.getFeature() != null) {
+      				for(String featureData : userRoleRequest.getFeature()) {
+      					UserRoleFeatureMap featureMap = new UserRoleFeatureMap();
+          				featureMap.setRoleId(userRoles.getUser_role_id());
+          				featureMap.setFeatureId(Long.valueOf(featureData));
+          				featureMap.setCreatedBy(userRoleRequest.getCreatedBy());
+          				featureMap.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+          				logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdateUserRoleEntityMap:: addOrUpdateRole");
+          				userRoleFeatureMapDao.saveOrUpdateUserRoleFeatureMap(featureMap);
+          				logger.info("Updating:: AdminRoleHandlerImpl:: FeaturesIn PortalRoleFeatureMap:: addOrUpdateRole method");
+      				//	featureMappingDao.addFeatureDataList(Long.valueOf(userRoleRequest.getRoleId()), featureData, String.valueOf(userId));
+      				}
+      			}
+      			logger.info("Exiting:: AdminRoleHandlerImpl:: addOrUpdateRole method");
+      		}
+      		responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_00);
+      		logger.info("Exiting:: AdminRoleHandlerImpl:: addOrUpdateRole method");
+    	} catch(BeaconServiceException e) {
+    		logger.error("ERROR:: AdminRoleHandlerImpl:: addOrUpdateRole method", e);
+    		throw e;
+    	} catch(Exception e) {
+    		userRoleFeatureMapDao.deleteUserRoleFeatureMap(Long.valueOf(userRoleRequest.getRoleId()));
+    		logger.error("ERROR:: AdminRoleHandlerImpl:: addOrUpdateRole method", e);
+    		responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_99);
+    		responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    	}
+    return responseErrorData;
+	}
+	
+	@Override
+	public UserRoleResponse getRolesByUserType(UserRoleRequest userRoleRequest) throws BeaconServiceException {
+		logger.info("Entering:: AdminRoleHandlerImpl:: getRolesByUserType method");
+		UserRoleResponse response = new UserRoleResponse();
+		try {
+			List<UserRoleRequest> userRoles = new ArrayList<UserRoleRequest>();
+			userRoles = userRoleDao.getUserRolesByRoleTypes(userRoleRequest);
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+			response.setUserRoleRequests(userRoles);
+			logger.info("Exiting:: AdminRoleHandlerImpl:: getRolesOnUserType method");
+		} catch(Exception e) {
+			logger.error("ERROR:: AdminRoleHandlerImpl:: getRolesByUserType method", e);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		return response;
+	}
+	
+  @Override
+  public UserRoleResponse searchRole(UserRoleRequest roleRequest) throws BeaconServiceException {
+    logger.info("Entering:: AdminRoleHandlerImpl:: searchRole method");
+    UserRoleResponse searchRoleResponse = new UserRoleResponse();
+    try {
+      List<UserRoleRequest> roleList = userRoleDao.searchRoles(roleRequest);
+      	searchRoleResponse.setResponseList(roleList);
+      	searchRoleResponse.setResponseCode(ErrorCode.ERROR_CODE_00);
+      	searchRoleResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+		searchRoleResponse.setNoOfRecords(roleRequest.getNoOfRecords());
+		logger.info("Exiting:: AdminRoleHandlerImpl:: searchRole method");
+    } catch(Exception e) {
+      logger.error("ERROR:: AdminRoleHandlerImpl:: searchRole method", e);
+      	searchRoleResponse.setResponseCode(ErrorCode.ERROR_CODE_99);
+      	searchRoleResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    }
+    return searchRoleResponse;
+  }
+
+  
+  @Override
+  public EditRoleResponse getRoleData(UserRoleRequest roleRequest) throws BeaconServiceException {
+    logger.info("Entering:: AdminRoleHandlerImpl:: getRoleData method");
+
+    EditRoleResponse editRoleResponseData = new EditRoleResponse();
+    try {
+      UserRole userRole = userRoleDao.findByUserRoleId(Long.valueOf(roleRequest.getRoleId()));
+      List<Long> existingFeature = stylopayFeatureDao.getFeatureDataOnRoleIdData(Long.valueOf(roleRequest.getRoleId()));
+ 
+      List<BeaconFeature> featureList = stylopayFeatureDao.getFeatureOnRoleLevel((userRole.getRole_type()), Constant.ACTIVE);
+     
+      List<BeaconFeatureRequest> features = CommonUtil.copyListBeanProperty(featureList, BeaconFeatureRequest.class);
+      roleRequest.setCreatedBy(userRole.getCreatedBy());
+      roleRequest.setDescription(userRole.getDescription());
+      roleRequest.setMakerCheckerRequired(userRole.getMaker_checker_req());
+      roleRequest.setRoleName(userRole.getName());
+      roleRequest.setReason(userRole.getReason());
+      roleRequest.setRoleType(RoleLevel.valueOf(userRole.getRole_type()));
+      roleRequest.setStatus(userRole.getStatus());
+      roleRequest.setUpdatedBy(userRole.getUpdatedBy());
+      roleRequest.setRoleId(String.valueOf(userRole.getUser_role_id()));
+    
+      editRoleResponseData.setRoleRequest(roleRequest);
+      editRoleResponseData.setFeatureMap((StringUtil.isListNotNullNEmpty(features)) ? getfeatureMap(features)  : null);
+      editRoleResponseData.setExistingFeature(existingFeature);
+      editRoleResponseData.setResponseCode(ErrorCode.ERROR_CODE_00);
+      editRoleResponseData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+      logger.info("Exiting:: AdminRoleHandlerImpl:: getRoleData method");
+    } catch(Exception e) {
+      logger.error("ERROR:: AdminRoleHandlerImpl:: getRoleData method", e);
+      editRoleResponseData.setResponseCode(ErrorCode.ERROR_CODE_99);
+      editRoleResponseData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    }
+    return editRoleResponseData;
+  }
+
+  
+ 
+   
+  @Override
+  public RoleFeatureResponse getFeatureList() throws BeaconServiceException {
+    logger.info("Entering:: AdminRoleHandlerImpl:: getFeatureList method");
+
+    RoleFeatureResponse roleFeatureResponse = new RoleFeatureResponse();
+    try {
+      List<BeaconFeature> featureList = stylopayFeatureDao.getFeatureList(Constant.ACTIVE);
+      
+      List<BeaconFeatureRequest> features = CommonUtil.copyListBeanProperty(featureList, BeaconFeatureRequest.class);
+      
+      if(StringUtil.isListNotNullNEmpty(features)) {
+    	  logger.info("Exiting:: AdminRoleHandlerImpl:: getFeatureList method");
+      	  roleFeatureResponse.setFeatureList(features);
+      	  roleFeatureResponse.setResponseCode(ErrorCode.ERROR_CODE_00);
+      	  roleFeatureResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+       }
+    } catch(Exception e) {
+       logger.error("ERROR:: AdminRoleHandlerImpl:: getFeatureList method", e);
+       roleFeatureResponse.setResponseCode(ErrorCode.ERROR_CODE_99);
+       roleFeatureResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+     }
+     return roleFeatureResponse;
+  }
+
+  private Map<Long, List<BeaconFeatureRequest>> getfeatureMap(List<BeaconFeatureRequest> featureList) {
+    logger.info("Entering:: AdminRoleHandlerImpl:: getFeatureList method");
+    List<BeaconFeatureRequest> featureListData = null;
+    Map<Long, List<BeaconFeatureRequest>> featureMap = new HashMap<Long, List<BeaconFeatureRequest>>();
+    for(BeaconFeatureRequest feature : featureList) {
+      if(feature.getFeatureLevel().longValue() == 0) {
+        featureListData = featureMap.get(feature.getFeatureId());
+        if(featureListData == null)
+          featureListData = new ArrayList<BeaconFeatureRequest>();
+        featureListData.add(feature);
+        featureMap.put(feature.getFeatureId(), featureListData);
+      }
+      else if(feature.getFeatureLevel().longValue() == 1) {
+        featureListData = featureMap.get(feature.getRefFeatureId());
+        if(featureListData == null)
+          featureListData = new ArrayList<BeaconFeatureRequest>();
+        featureListData.add(feature);
+        featureMap.put(feature.getRefFeatureId(), featureListData);
+
+      }
+
+    }
+    logger.info("Exiting:: AdminRoleHandlerImpl:: getFeatureList method");
+    return MapUtil.mySortedMap(featureMap);
+  }
+
+
+  @Override
+  public RoleFeatureResponse getFeatureOnRoleLevel(RoleLevelFeatureRequest roleLevelFeatureRequest) throws BeaconServiceException {
+    logger.info("Entering:: AdminRoleHandlerImpl:: getFeatureOnRoleLevel method");
+    RoleFeatureResponse roleFeatureResponse = new RoleFeatureResponse();
+    try {
+       List<BeaconFeature> featureList = stylopayFeatureDao.getFeatureOnRoleLevel("ADMIN".toString(),Constant.ACTIVE);
+    
+       List<BeaconFeatureRequest> features = CommonUtil.copyListBeanProperty(featureList, BeaconFeatureRequest.class);
+       roleFeatureResponse.setFeatureList((StringUtil.isListNotNullNEmpty(features)) ? features : null);
+       roleFeatureResponse.setResponseCode(ErrorCode.ERROR_CODE_00);
+       roleFeatureResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+      logger.info("Exiting:: AdminRoleHandlerImpl:: getFeatureOnRoleLevel method");
+    } catch(Exception e) {
+      logger.error("ERROR:: AdminRoleHandlerImpl:: getFeatureOnRoleLevel method", e);
+      roleFeatureResponse.setResponseCode(ErrorCode.ERROR_CODE_99);
+      roleFeatureResponse.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    }
+    return roleFeatureResponse;
+
+  }
+
+  
+  
+  @Override
+  public GetRolesOnUserTypeResponse getRolesOnUserType(GetRolesOnUserTypeRequest getRolesOnUserTypeRequest) throws BeaconServiceException {
+    logger.info("Entering:: AdminRoleHandlerImpl:: getRolesOnUserType method");
+    GetRolesOnUserTypeResponse response = new GetRolesOnUserTypeResponse();
+    try {
+      List<UserRoleRequest> userRoles = new ArrayList<UserRoleRequest>();
+      UserRoleRequest request = new UserRoleRequest();
+      if(!StringUtil.isNull(getRolesOnUserTypeRequest) && getRolesOnUserTypeRequest.getUserType() != null){
+    	  List<String> roleType = Arrays.asList(getRolesOnUserTypeRequest.getUserType().name());
+    	  	request.setRoleTypeList(roleType);
+			request.setStatus(Constant.ACTIVE);
+			userRoles = userRoleDao.getUserRolesByRoleTypes(request);
+      } else if(!StringUtil.isNull(getRolesOnUserTypeRequest) && getRolesOnUserTypeRequest.getRoleTypeList() != null){
+			request.setStatus(Constant.ACTIVE);
+			request.setRoleTypeList(getRolesOnUserTypeRequest.getRoleTypeList());
+			if(!StringUtil.isNull(getRolesOnUserTypeRequest.getEntityId())){
+				request.setEntityId(getRolesOnUserTypeRequest.getEntityId());
+			}
+			userRoles = userRoleDao.getUserRolesByRoleTypes(request);
+      } else {
+    	  List<String> roleType = Arrays.asList(RoleLevel.TOKEN.name(), RoleLevel.SPTSM.name(),RoleLevel.HCE.name());
+    	  request.setRoleTypeList(roleType);
+    	  request.setStatus(Constant.ACTIVE);
+    	  userRoles = userRoleDao.getUserRolesByRoleTypes(request);
+      }
+      response.setResponseCode(ErrorCode.ERROR_CODE_00);
+      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+      response.setRoles(userRoles);
+      logger.info("Exiting:: AdminRoleHandlerImpl:: getRolesOnUserType method");
+    } catch(Exception e) {
+      logger.error("ERROR:: AdminRoleHandlerImpl:: getRolesOnUserType method", e);
+      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    }
+    return response;
+  }
+
+@Override
+public Response changeRoleStatus(UserRoleRequest userRoleRequest)
+		throws BeaconServiceException {
+
+    logger.info("Entering:: AdminRoleHandlerImpl:: addOrUpdateRole method");
+    Response responseErrorData = new Response();
+    UserRole userRoles = new UserRole();
+    try {
+    	List<UserRole> roleData = userRoleDao.findByRoleName(userRoleRequest.getRoleName());
+    	
+    	UserRole createUserRole = CommonUtil.copyBeanProperties(userRoleRequest, UserRole.class);
+    	if (userRoleRequest.getRoleId() == null) {
+    		createUserRole.setRole_type(String.valueOf(userRoleRequest.getRoleType()));
+    		createUserRole.setStatus(Constant.ACTIVE);
+    		createUserRole.setName(userRoleRequest.getRoleName());
+    		createUserRole.setCreatedDate(DateUtil.getCurrentTimestamp());
+    		}
+    		
+    		if (userRoleRequest.getRoleId() !=null) {
+    			UserRole userRole = userRoleDao.findByUserRoleId(Long.valueOf(userRoleRequest.getRoleId()));
+      	
+      		if (userRoleRequest.getStatus() == null) {
+      			userRoleRequest.setStatus(userRole.getStatus());
+      			userRoleRequest.setReason(userRole.getReason());
+        }
+      		
+      		createUserRole.setStatus(userRoleRequest.getStatus());
+      		createUserRole.setName(userRoleRequest.getRoleName());
+      		createUserRole.setDescription(userRoleRequest.getDescription());
+      		createUserRole.setRole_type(userRole.getRole_type());
+      		createUserRole.setUpdated_Date(DateUtil.getCurrentTimestamp());
+      		createUserRole.setUser_role_id(Long.valueOf(userRoleRequest.getRoleId()));
+    	}
+    		logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdate ::addOrUpdateRole");
+    		userRoles =  userRoleDao.saveOrUpdateUserRole(createUserRole);
+      		if(userRoles.getUser_role_id() == null)
+      			throw new BeaconServiceException(Properties.getProperty("prepaid.role.error.message"));
+      
+      		if(userRoleRequest.getRoleId()== null && !StringUtil.isNull(userRoleRequest.getUserRoleEntityMapRequest())){
+      			UserRoleEntityMap userRoleEntityMap = CommonUtil.copyBeanProperties(userRoleRequest.getUserRoleEntityMapRequest(), UserRoleEntityMap.class);
+      			userRoleEntityMap.setUserRoleId(userRoles.getUser_role_id());
+      			logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdateUserRoleEntityMap:: addOrUpdateRole");
+          		userRoleEntityMap =  userRoleDao.saveOrUpdateUserRoleEntityMap(userRoleEntityMap);
+      		}
+      		
+      		if(userRoleRequest.getFeature() != null) {
+      			for(String featureData : userRoleRequest.getFeature()) {
+      				UserRoleFeatureMap featureMap = new UserRoleFeatureMap();
+      					featureMap.setRoleId(userRoles.getUser_role_id());
+						featureMap.setFeatureId(Long.valueOf(featureData));
+      					featureMap.setCreatedBy(userRoleRequest.getCreatedBy());
+      					featureMap.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+      					logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdateUserRoleEntityMap:: addOrUpdateRole");
+      					userRoleFeatureMapDao.saveOrUpdateUserRoleFeatureMap(featureMap);
+      					logger.info("Saving:: AdminRoleHandlerImpl:: FeaturesIn PortalRoleFeatureMap:: addOrUpdateRole method");
+      			}
+      		}
+      		
+      		if (userRoleRequest.getRoleId() != null && userRoleRequest.getFeature() != null) {
+      			logger.info(" AdminRoleHandlerImpl:: Before deleteUserRoleFeatureMap:: addOrUpdateRole");
+      			userRoleFeatureMapDao.deleteUserRoleFeatureMap(Long.valueOf(userRoleRequest.getRoleId()));
+      			if(userRoleRequest.getFeature() != null) {
+      				for(String featureData : userRoleRequest.getFeature()) {
+      					UserRoleFeatureMap featureMap = new UserRoleFeatureMap();
+          				featureMap.setRoleId(userRoles.getUser_role_id());
+          				featureMap.setFeatureId(Long.valueOf(featureData));
+          				featureMap.setCreatedBy(userRoleRequest.getCreatedBy());
+          				featureMap.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+          				logger.info(" AdminRoleHandlerImpl:: Before saveOrUpdateUserRoleEntityMap:: addOrUpdateRole");
+          				userRoleFeatureMapDao.saveOrUpdateUserRoleFeatureMap(featureMap);
+          				logger.info("Updating:: AdminRoleHandlerImpl:: FeaturesIn PortalRoleFeatureMap:: addOrUpdateRole method");
+      				//	featureMappingDao.addFeatureDataList(Long.valueOf(userRoleRequest.getRoleId()), featureData, String.valueOf(userId));
+      				}
+      			}
+      			logger.info("Exiting:: AdminRoleHandlerImpl:: addOrUpdateRole method");
+      		}
+      		responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_00);
+      		logger.info("Exiting:: AdminRoleHandlerImpl:: addOrUpdateRole method");
+    	} catch(BeaconServiceException e) {
+    		logger.error("ERROR:: AdminRoleHandlerImpl:: addOrUpdateRole method", e);
+    		throw e;
+    	} catch(Exception e) {
+    		userRoleFeatureMapDao.deleteUserRoleFeatureMap(Long.valueOf(userRoleRequest.getRoleId()));
+    		logger.error("ERROR:: AdminRoleHandlerImpl:: addOrUpdateRole method", e);
+    		responseErrorData.setResponseCode(ErrorCode.ERROR_CODE_99);
+    		responseErrorData.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+    	}
+    return responseErrorData;
+	}
+
+	@Override
+	public Response deleteRole(Long roleId) throws BeaconServiceException {
+		logger.info("Entering :: RoleServiceimpl :: deleteRole method");
+		Response response = new Response();
+		try {
+			UserRole userRole = userRoleDao.findByUserRoleId(roleId);
+			if (userRole == null) {
+				throw new BeaconServiceException(ErrorCode.ERROR_CODE_14, ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_14));
+			}
+			if (!Constant.ACTIVE.equals(userRole.getStatus())) {
+				throw new BeaconServiceException(ErrorCode.ERROR_CODE_131, ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_131));
+			}
+			userRole.setStatus(Constant.DELETED);
+			userRole.setCreatedDate(userRole.getCreatedDate());
+			userRole.setUpdated_Date(new Timestamp(System.currentTimeMillis()));
+			userRoleDao.saveOrUpdateUserRole(userRole);
+			response.setResponseCode(ErrorCode.ERROR_CODE_00);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+
+		} catch (BeaconServiceException e) {
+			logger.error("Error :: RoleServiceimpl :: deleteRole method", e);
+			response.setResponseCode(e.getErrorCode());
+			response.setResponseMessage(e.getMessage());
+		} catch (Exception e) {
+			logger.error("Error :: RoleServiceimpl :: deleteRole method", e);
+			response.setResponseCode(ErrorCode.ERROR_CODE_99);
+			response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		}
+		logger.info("Exiting :: RoleServiceimpl :: deleteRole method");
+		return response;
+	}
+  
+
+
+
+}

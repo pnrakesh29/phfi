@@ -1,0 +1,14 @@
+<html>
+<body>
+Welcome <b>$firstName</b>, <br/><br/>
+
+Your PHFI $usertype Admin user account has been created for role $roleName<br/>
+Your Username is <b>$userName</b><br/>
+Your temporary password is <b>$tempPassword</b>
+<br/><br/>
+<br/><br/>
+Thanks,
+PHFI Team.
+
+</body>
+</html>

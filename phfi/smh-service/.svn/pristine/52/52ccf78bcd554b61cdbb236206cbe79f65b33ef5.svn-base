@@ -1,0 +1,145 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.FloorPlanDao;
+import com.chatak.beacon.dao.model.FloorPlan;
+import com.chatak.beacon.dao.model.QFloorPlan;
+import com.chatak.beacon.dao.model.QZone;
+import com.chatak.beacon.dao.repository.FloorPlanRepository;
+import com.chatak.beacon.model.FloorPlanRequest;
+import com.chatak.beacon.util.StringUtil;
+import com.mysema.query.Tuple;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.expr.BooleanExpression;
+
+/**
+*
+* << Add Comments Here >>
+*
+* @author Girmiti Software
+* @date 24-Nov-2015 2:20:11 PM
+* @version 1.0
+*/
+@Repository("floorPlanDao")
+public class FloorPlanDaoImpl implements FloorPlanDao {
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Autowired
+	private FloorPlanRepository floorPlanRepository;
+	
+	@Override
+	public FloorPlan createOrUpdateFloorPlan(FloorPlan floorPlanRequest) {
+		return floorPlanRepository.save(floorPlanRequest);
+	}
+
+	@Override
+	public FloorPlan findById(Long id) {
+		return floorPlanRepository.findById(id);
+	}
+	
+	@Override
+	public List<FloorPlan> findByFloorPlanName(String floorName) {
+		return floorPlanRepository.findByFloorPlanName(floorName);
+	}
+	
+	public List<FloorPlanRequest> searchFloorPlans(FloorPlanRequest floorPlanRequest) {
+		List<FloorPlanRequest> floorPlanList = new ArrayList<FloorPlanRequest>();
+		int startIndex = 0;
+		int endIndex = 0;
+		Integer totalRecords = floorPlanRequest.getNoOfRecords();
+
+		if (floorPlanRequest.getPageIndex() == null
+				|| floorPlanRequest.getPageIndex() == 1) {
+			totalRecords = getTotalNumberOfRecords(floorPlanRequest);
+			floorPlanRequest.setNoOfRecords(totalRecords);
+		}
+
+		if (floorPlanRequest.getPageIndex() == null
+				&& floorPlanRequest.getPageSize() == null) {
+			startIndex = 0;
+			endIndex = Constant.DEFAULT_PAGE_SIZE;
+		} else {
+			startIndex = (floorPlanRequest.getPageIndex() - 1)
+					* floorPlanRequest.getPageSize();
+			endIndex = startIndex + floorPlanRequest.getPageSize();
+		}
+		JPAQuery query = new JPAQuery(entityManager);
+		QZone zone = QZone.zone;
+		QFloorPlan floorPlan = QFloorPlan.floorPlan;
+		List<Tuple> tupleList = query
+				.from(floorPlan, zone)
+				.where(isFloorPlanNameEq(floorPlanRequest.getFloorPlanName()),
+						floorPlan.zoneId.eq(zone.id),
+						isZoneIdEq(floorPlanRequest.getZoneId()),
+						isStatusEq(floorPlanRequest.getStatus()))
+				.offset(startIndex)
+				.limit(endIndex)
+				.orderBy(QFloorPlan.floorPlan.createdDate.desc())
+				.list(QFloorPlan.floorPlan.floorPlanName, 
+						QFloorPlan.floorPlan.width,QFloorPlan.floorPlan.height,QFloorPlan.floorPlan.length,
+						QFloorPlan.floorPlan.status, QFloorPlan.floorPlan.lowerLeftXY,QFloorPlan.floorPlan.lowerRightXY,
+						QFloorPlan.floorPlan.upperLeftXY,QFloorPlan.floorPlan.upperRightXY,
+						QFloorPlan.floorPlan.id, zone.zoneName);
+
+		for (Tuple tuple : tupleList) {
+			FloorPlanRequest planRequest = new FloorPlanRequest();
+			planRequest.setFloorPlanName(tuple.get(QFloorPlan.floorPlan.floorPlanName));
+			planRequest.setHeight(tuple.get(QFloorPlan.floorPlan.height));
+			planRequest.setWidth(tuple.get(QFloorPlan.floorPlan.width));
+			planRequest.setLength(tuple.get(QFloorPlan.floorPlan.length));
+			planRequest.setLowerLeftXY(tuple.get(QFloorPlan.floorPlan.lowerLeftXY));
+			planRequest.setLowerRightXY(tuple.get(QFloorPlan.floorPlan.lowerRightXY));
+			planRequest.setUpperLeftXY(tuple.get(QFloorPlan.floorPlan.upperLeftXY));
+			planRequest.setUpperRightXY(tuple.get(QFloorPlan.floorPlan.upperRightXY));
+			planRequest.setStatus(tuple.get(QFloorPlan.floorPlan.status));
+			planRequest.setId(tuple.get(QFloorPlan.floorPlan.id));
+			planRequest.setZoneName(tuple.get(zone.zoneName));
+			floorPlanList.add(planRequest);
+		}
+
+		return floorPlanList;
+	}
+
+	private int getTotalNumberOfRecords(FloorPlanRequest floorPlanRequest) {
+		JPAQuery query = new JPAQuery(entityManager);
+		QZone zone = QZone.zone;
+		QFloorPlan floor = QFloorPlan.floorPlan;
+		List<Long> list = query
+				.from(floor, zone)
+				.where(isFloorPlanNameEq(floorPlanRequest.getFloorPlanName()),
+						QFloorPlan.floorPlan.zoneId.eq(zone.id),
+						isZoneIdEq(floorPlanRequest.getZoneId()),
+						isStatusEq(floorPlanRequest.getStatus()))
+				.list(QFloorPlan.floorPlan.id);
+		return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+	}
+
+	private BooleanExpression isFloorPlanNameEq(String floorName) {
+		return (floorName != null && !"".equals(floorName)) ? QFloorPlan.floorPlan.floorPlanName
+				.toUpperCase().like(
+						"%" + floorName.toUpperCase().replace("*", "") + "%")
+				: null;
+	}
+
+	private BooleanExpression isZoneIdEq(Long zoneId) {
+		return (zoneId != null) ? QFloorPlan.floorPlan.zoneId.eq(zoneId) : null;
+	}
+
+	private BooleanExpression isStatusEq(String status) {
+		return (status != null && !("".equals(status))) ?  QFloorPlan.floorPlan.status.eq(status): null;
+	}
+	
+	
+
+}

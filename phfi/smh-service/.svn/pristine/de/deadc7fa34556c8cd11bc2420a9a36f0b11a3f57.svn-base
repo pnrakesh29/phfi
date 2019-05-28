@@ -1,0 +1,18 @@
+package com.chatak.beacon.dao.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+
+import com.chatak.beacon.dao.model.AdminUser;
+
+public interface AdminUserRepository extends JpaRepository<AdminUser, Long>, QueryDslPredicateExecutor<AdminUser> {
+
+	List<AdminUser> findByUserNameAndPassword(String userName, String password);
+
+	public List<AdminUser> findByUserName(String userName);
+
+	public List<AdminUser> findByEmail(String email);
+
+}

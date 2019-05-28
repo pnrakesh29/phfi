@@ -1,0 +1,246 @@
+package com.chatak.beacon.handler.impl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.BeaconErrorCodes;
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.FloorPlanDao;
+import com.chatak.beacon.dao.LocationDao;
+import com.chatak.beacon.dao.ZoneDao;
+import com.chatak.beacon.dao.model.FloorPlan;
+import com.chatak.beacon.dao.model.Location;
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.handler.FloorPlanHandler;
+import com.chatak.beacon.model.FloorPlanRequest;
+import com.chatak.beacon.model.FloorPlanResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.DateUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+@Service
+public class FloorPlanHandlerImpl implements FloorPlanHandler {
+
+	private static Logger logger = Logger.getLogger(FloorPlanHandlerImpl.class);
+
+	@Autowired
+	private FloorPlanDao floorPlanDao;
+
+	@Autowired
+	private ZoneDao zoneDao;
+	
+	@Autowired
+	private LocationDao locationDao;
+
+	@Override
+	public Response floorPlanCreate(FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: FloorPlanHandlerImpl :: floorPlanCreate method");
+		Response response = new Response();
+		try {
+			Zone zone = zoneDao.findById(floorPlanRequest.getZoneId());
+			if (!Constant.ACTIVE.equalsIgnoreCase(zone.getStatus())) {
+				response.setResponseCode(BeaconErrorCodes.ZONE_STATUS_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			
+			Location location = locationDao.findById(zone.getLocationId());
+			if(!Constant.ACTIVE.equalsIgnoreCase(location.getStatus())){
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			List<FloorPlan> floors = floorPlanDao.findByFloorPlanName(floorPlanRequest.getFloorPlanName().trim());
+			if (StringUtil.isListNotNullNEmpty(floors)) {
+				response.setResponseCode(BeaconErrorCodes.FLOOR_PLAN_ALREADY_EXIST);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+
+			FloorPlan floorPlan = CommonUtil.copyBeanProperties(floorPlanRequest, FloorPlan.class);
+			floorPlan.setStatus(Constant.ACTIVE);
+			floorPlan.setCreatedBy(Constant.CREATED_BY);
+			floorPlan.setCreatedDate(DateUtil.getCurrentTimestamp());
+			floorPlan.setUpdatedBy(Constant.CREATED_BY);
+			floorPlan.setUpdatedDate(DateUtil.getCurrentTimestamp());
+			floorPlanDao.createOrUpdateFloorPlan(floorPlan);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: FloorPlanHandlerImpl :: floorPlanCreate method",e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(BeaconErrorCodes.SYSTEM_ERROR));
+		}
+		logger.info("Exiting :: FloorPlanHandlerImpl :: floorPlanCreate method");
+
+		return response;
+	}
+
+	@Override
+	public Response floorPlanUpdate(FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: FloorPlanHandlerImpl :: floorPlanUpdate method");
+		Response response = new Response();
+		try {
+			FloorPlan originalFloor = floorPlanDao.findById(floorPlanRequest.getId());
+			if (StringUtil.isNull(originalFloor)) {
+				response.setResponseCode(BeaconErrorCodes.FLOOR_PLAN_NOT_EXIST);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			Zone zone = zoneDao.findById(floorPlanRequest.getZoneId());
+			if (!Constant.ACTIVE.equalsIgnoreCase(zone.getStatus())) {
+				response.setResponseCode(BeaconErrorCodes.ZONE_STATUS_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			Location location = locationDao.findById(zone.getLocationId());
+			if(!Constant.ACTIVE.equalsIgnoreCase(location.getStatus())){
+				response.setResponseCode(BeaconErrorCodes.LOCATION_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			if (!Constant.ACTIVE.equalsIgnoreCase(originalFloor.getStatus())) {
+				response.setResponseCode(BeaconErrorCodes.FLOOR_PLAN_NOT_ACTIVE);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+			List<FloorPlan> floors = floorPlanDao.findByFloorPlanName(floorPlanRequest.getFloorPlanName().trim());
+			Boolean floorNameExists = Boolean.FALSE;
+			for (FloorPlan floor : floors) {
+				if (floor.getId().compareTo(floorPlanRequest.getId()) != 0) {
+					floorNameExists = Boolean.TRUE;
+					break;
+				}
+			}
+			if (floorNameExists) {
+				response.setResponseCode(BeaconErrorCodes.FLOOR_PLAN_ALREADY_EXIST);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+				return response;
+			}
+
+			FloorPlan floor = CommonUtil.copyBeanProperties(floorPlanRequest,FloorPlan.class);
+			floor.setUpdatedBy(Constant.CREATED_BY);
+			floor.setUpdatedDate(DateUtil.getCurrentTimestamp());
+			floorPlanDao.createOrUpdateFloorPlan(floor);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+        	response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: FloorPlanHandlerImpl :: floorPlanUpdate method",e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: FloorPlanHandlerImpl :: floorPlanUpdate method");
+		return response;
+	}
+
+	@Override
+	public FloorPlanResponse searchFloorPlans(FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: FloorPlanHandlerImpl :: searchFloorPlans method");
+		FloorPlanResponse response = new FloorPlanResponse();
+
+		try {
+			List<FloorPlanRequest> floorPlanRequests = floorPlanDao.searchFloorPlans(floorPlanRequest);
+			response.setFloorPlanRequests(floorPlanRequests);
+			response.setNoOfRecords(floorPlanRequest.getNoOfRecords());
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+        	response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: FloorPlanHandlerImpl :: searchFloorPlans method");
+
+		return response;
+	}
+
+	@Override
+	public FloorPlanResponse findFloorPlanDetails(FloorPlanRequest floorPlanRequest) {
+		logger.info("Entering :: FloorPlanHandlerImpl :: findFloorPlanDetails method");
+		FloorPlanResponse response = new FloorPlanResponse();
+		List<FloorPlanRequest> responseList = new ArrayList<FloorPlanRequest>();
+		try {
+			FloorPlan floor = floorPlanDao.findById(floorPlanRequest.getId());
+			if (floor == null) {
+				response.setResponseCode("");
+				response.setResponseMessage("");
+				return response;
+			}
+			FloorPlanRequest request = CommonUtil.copyBeanProperties(floor,FloorPlanRequest.class);
+			responseList.add(request);
+			response.setFloorPlanRequests(responseList);
+			response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		} catch (Exception e) {
+			logger.error("Error :: FloorPlanHandlerImpl :: findFloorPlanDetails method",e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: FloorPlanHandlerImpl :: findFloorPlanDetails method");
+
+		return response;
+	}
+
+	@Override
+	public Response deleteFloorPlan(Long id) {
+
+		Response response = new Response();
+		logger.info("Entering :: FloorPlanHandlerImpl :: deleteFloorPlan method");
+		try {
+			FloorPlan floor = floorPlanDao.findById(id);
+			FloorPlanRequest searchFloorPlanRequest = CommonUtil.copyBeanProperties(floor, FloorPlanRequest.class);
+			if (searchFloorPlanRequest.getStatus().equals(Constant.ACTIVE)) {
+				floor.setStatus(Constant.DELETED);
+				floor.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+				floorPlanDao.createOrUpdateFloorPlan(floor);
+				response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+	        	response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			} else {
+				response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			}
+		} catch (Exception e) {
+			logger.error("Error :: FloorPlanHandlerImpl :: deleteFloorPlan method",e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: FloorPlanHandlerImpl :: deleteFloorPlan method");
+		return response;
+
+	}
+
+	@Override
+	public Response changeStatus(FloorPlanRequest floorPlanRequest) {
+
+		Response response = new Response();
+		logger.info("Entering :: FloorPlanHandlerImpl :: changeStatus method");
+		try {
+			FloorPlan plan = floorPlanDao.findById(floorPlanRequest.getId());
+			FloorPlanRequest searchFloorPlanRequest = CommonUtil.copyBeanProperties(plan, FloorPlanRequest.class);
+			if (searchFloorPlanRequest != null) {
+				plan.setStatus(floorPlanRequest.getStatus());
+				plan.setReason(floorPlanRequest.getReason());
+				plan.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+				floorPlanDao.createOrUpdateFloorPlan(plan);
+				response.setResponseCode(BeaconErrorCodes.BEACON_SUCCESS);
+	        	response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			} else {
+				response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+				response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+			}
+		} catch (Exception e) {
+			logger.error("Error :: FloorPlanHandlerImpl :: changeStatus method", e);
+			response.setResponseCode(BeaconErrorCodes.SYSTEM_ERROR);
+			response.setResponseMessage(Properties.getProperty(response.getResponseCode()));
+		}
+		logger.info("Exiting :: FloorPlanHandlerImpl :: changeStatus method");
+		return response;
+	}
+
+}

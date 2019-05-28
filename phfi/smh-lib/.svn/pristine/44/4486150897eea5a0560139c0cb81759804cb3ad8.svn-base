@@ -1,0 +1,153 @@
+package com.chatak.beacon.constants;
+
+import java.util.HashMap;
+
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class ErrorCode {
+
+  private static HashMap mMessages;
+
+  private static ErrorCode mInstance = null;
+
+
+  public static final String ERROR_CODE_00 = "00";
+  
+  public static final String ERROR_CODE_14 = "14";
+
+  public static final String ERROR_CODE_63 = "63";
+
+  public static final String ERROR_CODE_68 = "68";
+
+  public static final String ERROR_CODE_69 = "69";
+
+  public static final String ERROR_CODE_76 = "76";
+
+  public static final String ERROR_CODE_77 = "77";
+
+  public static final String ERROR_CODE_78 = "78";
+
+  public static final String ERROR_CODE_79 = "79";
+
+  public static final String ERROR_CODE_80 = "80";
+
+  public static final String ERROR_CODE_98 = "98";
+
+  public static final String ERROR_CODE_99 = "99";
+
+  public static final String ERROR_CODE_109 = "109";
+  
+  public static final String ERROR_CODE_110 = "110";
+
+  public static final String ERROR_CODE_111 = "111";
+  
+  public static final String ERROR_CODE_112 = "112";
+ 
+  public static final String ERROR_CODE_116 = "116";
+  
+  public static final String ERROR_CODE_117 = "117";
+  
+  public static final String ERROR_CODE_118 = "118";
+  
+  public static final String ERROR_CODE_119 = "119";
+  
+  public static final String ERROR_CODE_120 = "120";
+  
+  public static final String ERROR_CODE_121 = "121";
+  
+  public static final String ERROR_CODE_125 = "125";
+  
+  public static final String ERROR_CODE_126 = "126";
+  
+  public static final String ERROR_CODE_127 = "127";
+  
+  public static final String ERROR_CODE_131 = "131";
+  
+  public static final String ERROR_CODE_147 = "147";
+  
+  public static final String ERROR_CODE_148 = "148";
+  
+  public static final String SUCCESS = "00";
+  public static final String SYSTEM_ERROR = "99";
+  public static final String ZONE_CREATED = "200";
+  public static final String ZONE_UPDATED = "201";
+  public static final String ZONE_NOT_FOUND = "202";
+  public static final String STATUS_NOT_ACTIVE = "203";
+  
+  
+
+  
+  
+  
+
+  /** Default Constructor */
+
+  public ErrorCode() {
+    initMessages();
+  }
+
+  /**
+   * This method get the message based on code
+   * 
+   * @param code
+   * @return String
+   */
+  public String getMessage(String code) {
+    Object obj = mMessages.get(code);
+    String msg = null;
+    if(obj != null)
+      msg = (String) obj;
+    else
+      msg = "Unknown Message";
+    return msg;
+  }
+
+  private void initMessages() {
+    mMessages = new HashMap(125);
+    mMessages.put(ERROR_CODE_00, "Success");
+    mMessages.put(ERROR_CODE_14, "Invalid request");
+    mMessages.put(ERROR_CODE_63, "The Username or Password you entered is incorrect.");
+    mMessages.put(ERROR_CODE_68, "User is not Active,please contact to admin");
+    mMessages.put(ERROR_CODE_69, "User is Blocked,please contact to admin");
+    mMessages.put(ERROR_CODE_76, "Security Answer is invalid");
+    mMessages.put(ERROR_CODE_77, "Invalid Username");
+    mMessages.put(ERROR_CODE_78, "User Details not found.Please enter valid User Id");
+    mMessages.put(ERROR_CODE_79, "Admin user is not in active status to process your change password request");
+    mMessages.put(ERROR_CODE_80, "Old and new password should not be the same, please try with new password");
+    mMessages.put(ERROR_CODE_109, " Admin user already exists with same e-mail id");
+    mMessages.put(ERROR_CODE_110, " Admin user already exists.Please try with different username.");
+    mMessages.put(ERROR_CODE_111, " Role name already exist.Please choose different Role name.");
+    mMessages.put(ERROR_CODE_112, " User Details Not Found.Please Enter valid User Details.");
+    mMessages.put(ERROR_CODE_116, " New password should not be same as 3 previous passwords.");
+    mMessages.put(ERROR_CODE_117, " Your password has expired. Please change your password.");
+    mMessages.put(ERROR_CODE_118, " User is requested to change the system generated password.");
+    mMessages.put(ERROR_CODE_119, " Reset your password.");
+    mMessages.put(ERROR_CODE_120, " Your account is blocked due to wrong password attempts. Please contact administrator.");
+    mMessages.put(ERROR_CODE_121, " Your account is suspended. Please contact administrator.");
+    mMessages.put(ERROR_CODE_125, "Role is not Active");
+    mMessages.put(ERROR_CODE_126, "User is not Active");
+    mMessages.put(ERROR_CODE_127, " Current Password is not valid.");
+    mMessages.put(ERROR_CODE_131, "Role is not Active");
+	mMessages.put(ERROR_CODE_147, "Status is already $$$##");
+	mMessages.put(ERROR_CODE_148, "Status Updated to $$$## Successfully");
+	//added for zone management 
+	
+	
+	
+
+	mMessages.put(ERROR_CODE_98, "All Fields in are Mandatory");
+	mMessages.put(ERROR_CODE_99, "System error");
+  }
+
+  /**
+   * Returns the singleton instance.
+   * 
+   * @return the singleton instance
+   */
+  public static final synchronized ErrorCode getInstance() {
+    if(mInstance == null) {
+      mInstance = new ErrorCode();
+    }
+    return mInstance;
+  }
+
+}

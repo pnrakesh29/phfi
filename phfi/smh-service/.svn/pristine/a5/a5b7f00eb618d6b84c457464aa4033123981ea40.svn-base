@@ -1,0 +1,124 @@
+package com.chatak.beacon.rest.service;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.exception.BeaconServiceException;
+import com.chatak.beacon.model.EditRoleResponse;
+import com.chatak.beacon.model.GetRolesOnUserTypeRequest;
+import com.chatak.beacon.model.GetRolesOnUserTypeResponse;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.RoleFeatureResponse;
+import com.chatak.beacon.model.RoleLevelFeatureRequest;
+import com.chatak.beacon.model.UserRoleRequest;
+import com.chatak.beacon.model.UserRoleResponse;
+
+
+/**
+ * An interface to provide role handler services
+ * 
+ * @Author: Girmiti Software
+ * @Version: 1.0
+ * @Comments:
+ */
+@Service
+public interface RestRoleService {
+	
+	/**
+	 * An handler method used to create role
+	 * @param createRoleRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public Response createOrUpdateRole(HttpServletRequest request,
+									   HttpServletResponse response,
+									   HttpSession session,
+									   UserRoleRequest userRoleRequest) throws BeaconServiceException;
+	
+	/**
+	 * An handler method used to create role
+	 * @param createRoleRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public Response changeRoleStatus(HttpServletRequest request,
+								     HttpServletResponse response,
+								     HttpSession session,
+								     UserRoleRequest userRoleRequest) throws BeaconServiceException;
+	
+	
+	/**
+	 * An handler method user to retrieve the user roles
+	 * @param userRoleRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public UserRoleResponse getRolesByUserType(HttpServletRequest request,
+											   HttpServletResponse response,
+											   HttpSession session,
+											   UserRoleRequest userRoleRequest) throws BeaconServiceException;
+	
+	/**
+	 * An handler method used to search role
+	 * @param searchRoleRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public UserRoleResponse searchRole(HttpServletRequest request,
+									   HttpServletResponse response,
+									   HttpSession session,
+									   UserRoleRequest userRoleRequest) throws BeaconServiceException;
+ 
+	/**
+	 * An handler method used to retrieve the role details
+	 * @param editRoleRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public EditRoleResponse getRoleData(HttpServletRequest request,
+									    HttpServletResponse response,
+									    HttpSession session,
+									    UserRoleRequest userRoleRequest) throws BeaconServiceException;
+
+	/**
+	 * An handler method used to retrieve the feature list
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public RoleFeatureResponse getFeatureList() throws BeaconServiceException;
+
+	/**
+	 * An handler method used to retrieve the feature on role leave
+	 * @param roleLevelFeatureRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public RoleFeatureResponse getFeatureOnRoleLevel(HttpServletRequest request,
+													 HttpServletResponse response,
+												     HttpSession session,
+												     RoleLevelFeatureRequest roleLevelFeatureRequest) throws BeaconServiceException;
+
+	/**
+	 * An handler method used to retrieve the roles on user type
+	 * @param getRolesOnUserTypeRequest
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public GetRolesOnUserTypeResponse getRolesOnUserType(HttpServletRequest request,
+														 HttpServletResponse response,
+													     HttpSession session,
+													   	 GetRolesOnUserTypeRequest getRolesOnUserTypeRequest) throws BeaconServiceException;
+	
+	/** Service to delete Role
+	 * 
+	 * @param roleId
+	 * @return
+	 * @throws BeaconServiceException
+	 */
+	public Response deleteRole(Long roleId) throws BeaconServiceException;
+
+
+}

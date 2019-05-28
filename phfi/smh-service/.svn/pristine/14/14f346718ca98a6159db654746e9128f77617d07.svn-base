@@ -1,0 +1,49 @@
+package com.chatak.beacon.dao.model;
+
+import static com.mysema.query.types.PathMetadataFactory.*;
+
+import com.mysema.query.types.path.*;
+
+import com.mysema.query.types.PathMetadata;
+import javax.annotation.Generated;
+import com.mysema.query.types.Path;
+
+
+/**
+ * QStylopayFeature is a Querydsl query type for StylopayFeature
+ */
+@Generated("com.mysema.query.codegen.EntitySerializer")
+public class QStylopayFeature extends EntityPathBase<StylopayFeature> {
+
+    private static final long serialVersionUID = -192114371L;
+
+    public static final QStylopayFeature stylopayFeature = new QStylopayFeature("stylopayFeature");
+
+    public final DateTimePath<java.sql.Timestamp> createdDate = createDateTime("createdDate", java.sql.Timestamp.class);
+
+    public final NumberPath<Long> featureId = createNumber("featureId", Long.class);
+
+    public final NumberPath<Long> featureLevel = createNumber("featureLevel", Long.class);
+
+    public final StringPath name = createString("name");
+
+    public final NumberPath<Long> refFeatureId = createNumber("refFeatureId", Long.class);
+
+    public final StringPath roleType = createString("roleType");
+
+    public final StringPath status = createString("status");
+
+    public QStylopayFeature(String variable) {
+        super(StylopayFeature.class, forVariable(variable));
+    }
+
+    public QStylopayFeature(Path<? extends StylopayFeature> path) {
+        super(path.getType(), path.getMetadata());
+    }
+
+    public QStylopayFeature(PathMetadata<?> metadata) {
+        super(StylopayFeature.class, metadata);
+    }
+
+}
+

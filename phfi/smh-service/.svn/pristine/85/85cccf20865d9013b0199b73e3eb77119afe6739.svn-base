@@ -1,0 +1,255 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
+* << Add Comments Here >>
+* 
+* @author Girmiti Software
+* @date 16-Nov-2015 12:19:51 PM
+* @version 1.0
+*/
+@Entity
+@Table(name = "BEACON_MANAGEMENT")
+public class Beacon implements Serializable {
+	
+	
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2707000283124940266L;
+
+	  @Id
+	  @SequenceGenerator(name = "SEQ_BEACON_MANAGEMENT_ID", sequenceName = "SEQ_BEACON_MANAGEMENT")
+	  @GeneratedValue(generator = "SEQ_BEACON_MANAGEMENT_ID")
+	  @Column(name = "ID")
+	  private Long id;
+	  
+	  @Column(name = "BEACON_ID")
+	  private String beaconId;
+
+	  @Column(name = "BEACON_NAME")
+	  private String beaconName;
+
+	  @Column(name = "DESCRIPTION")
+	  private String beaconDesc;
+
+	  @Column(name = "MANUFACTURER")
+	  private String manufacturer;
+	 
+	  @Column(name = "model")
+	  private String model;
+
+	  @Column(name = "make")
+	  private String make;
+
+	  @Column(name = "EXP_DATE")
+	  private Timestamp expDate;
+
+	  @Column(name = "STATUS")
+	  private String status;
+	  
+	  @Column(name = "created_date")
+	  private Timestamp createdDate;
+
+	  @Column(name = "created_by")
+	  private String createdBy;
+
+	  @Column(name = "updated_date")
+	  private Timestamp updatedDate;
+
+	  @Column(name = "updated_by")
+	  private String updatedBy;
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the beaconId
+	 */
+	public String getBeaconId() {
+		return beaconId;
+	}
+
+	/**
+	 * @param beaconId the beaconId to set
+	 */
+	public void setBeaconId(String beaconId) {
+		this.beaconId = beaconId;
+	}
+
+	/**
+	 * @return the beaconName
+	 */
+	public String getBeaconName() {
+		return beaconName;
+	}
+
+	/**
+	 * @param beaconName the beaconName to set
+	 */
+	public void setBeaconName(String beaconName) {
+		this.beaconName = beaconName;
+	}
+
+	/**
+	 * @return the manufacturer
+	 */
+	public String getManufacturer() {
+		return manufacturer;
+	}
+
+	/**
+	 * @param manufacturer the manufacturer to set
+	 */
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+
+	/**
+	 * @return the model
+	 */
+	public String getModel() {
+		return model;
+	}
+
+	/**
+	 * @param model the model to set
+	 */
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	/**
+	 * @return the make
+	 */
+	public String getMake() {
+		return make;
+	}
+
+	/**
+	 * @param make the make to set
+	 */
+	public void setMake(String make) {
+		this.make = make;
+	}
+
+	/**
+	 * @return the expDate
+	 */
+	public Timestamp getExpDate() {
+		return expDate;
+	}
+
+	/**
+	 * @param expDate the expDate to set
+	 */
+	public void setExpDate(Timestamp expDate) {
+		this.expDate = expDate;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the createdDate
+	 */
+	public Timestamp getCreatedDate() {
+		return createdDate;
+	}
+
+	/**
+	 * @param createdDate the createdDate to set
+	 */
+	public void setCreatedDate(Timestamp createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	/**
+	 * @return the createdBy
+	 */
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	/**
+	 * @param createdBy the createdBy to set
+	 */
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	/**
+	 * @return the updatedDate
+	 */
+	public Timestamp getUpdatedDate() {
+		return updatedDate;
+	}
+
+	/**
+	 * @param updatedDate the updatedDate to set
+	 */
+	public void setUpdatedDate(Timestamp updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
+	/**
+	 * @return the updatedBy
+	 */
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	/**
+	 * @param updatedBy the updatedBy to set
+	 */
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	/**
+	 * @return the beaconDesc
+	 */
+	public String getBeaconDesc() {
+		return beaconDesc;
+	}
+
+	/**
+	 * @param beaconDesc the beaconDesc to set
+	 */
+	public void setBeaconDesc(String beaconDesc) {
+		this.beaconDesc = beaconDesc;
+	}
+
+
+}

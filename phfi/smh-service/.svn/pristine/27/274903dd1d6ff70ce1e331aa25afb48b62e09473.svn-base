@@ -1,0 +1,21 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.ChangeStatusRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.LocationResponse;
+import com.chatak.beacon.model.Response;
+
+public interface LocationHandler {
+
+	public Response createLocation(LocationRequest locationRequest);
+
+	public Response updateLocation(LocationRequest locationRequest);
+
+	public LocationResponse searchLocation(LocationRequest locationRequest);
+
+	public LocationResponse findLocationById(Long profileId);
+
+	public LocationResponse deleteLocation(Long id);
+
+	public LocationResponse changeStatus(ChangeStatusRequest changeStatusRequest);
+}

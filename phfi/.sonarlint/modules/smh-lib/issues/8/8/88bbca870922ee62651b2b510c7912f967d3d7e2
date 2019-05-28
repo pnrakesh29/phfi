@@ -1,0 +1,23 @@
+
+dsquid:S1197D"8Move the array designator from the variable to the type.(º®ë1HìRMINORZ
+CODE_SMELL
+e
+squid:S106©"9Replace this use of System.out or System.err by a logger.(Äş!HíRMAJORZ
+CODE_SMELL
+\squid:S001088")Either remove or fill this block of code.(Ä‘öùÿÿÿÿHîRMAJORZ
+CODE_SMELL
+jsquid:S1197G"8Move the array designator from the variable to the type.(™‹¤ıÿÿÿÿHïRMINORZ
+CODE_SMELL
+ƒsquid:S1450"VRemove the "matcher" field and declare it as a local variable in the relevant methods.(¥½³ÚHğRMINORZ
+CODE_SMELL
+€squid:S1192X"KDefine a constant instead of duplicating this literal "0123456789" 3 times.(œÙ¤‡ÿÿÿÿÿHñRCRITICALZ
+CODE_SMELL
+k
+squid:S106ª"9Replace this use of System.out or System.err by a logger.(úİÇöøÿÿÿÿHòRMAJORZ
+CODE_SMELL
+k
+squid:S106¦"9Replace this use of System.out or System.err by a logger.(‡öĞıÿÿÿÿHóRMAJORZ
+CODE_SMELL
+Œsquid:S2068"U'PASSWORD' detected in this expression, review this potentially hardcoded credential.(¤ÕíûøÿÿÿÿHôRBLOCKERZVULNERABILITY
+jsquid:S1197"8Move the array designator from the variable to the type.(Ã†¯ûıÿÿÿÿHõRMINORZ
+CODE_SMELL

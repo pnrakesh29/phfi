@@ -1,0 +1,279 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "ZONE")
+public class Zone implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@SequenceGenerator(name = "seq_zone_id", sequenceName = "SEQ_ZONE")
+	@GeneratedValue(generator = "seq_zone_id")
+	@Column(name = "ID")
+	private Long id;
+
+	@Column(name = "ZONE_NAME")
+	private String zoneName;
+
+	@Column(name = "LOCATION_ID")
+	private Long locationId;
+
+	@Column(name = "GEOFENCE")
+	private String geofence;
+	
+	@Column(name = "LATTITUDE")
+	private Double lattitude;
+	
+	@Column(name = "LONGITUDE")
+	private Double longitude;
+	
+	@Column(name = "RADIUS")
+	private Double radius;
+	
+	@Column(name = "TYPE")
+	private String type;
+	
+	@Column(name = "SUB_TYPE")
+	private String subType;
+	
+	@Column(name = "STATUS")
+	private String status;
+	
+	@Column(name = "REASON")
+	private String reason;
+
+	@Column(name = "CREATED_DATE", updatable=false)
+	private Timestamp createdDate;
+
+	@Column(name = "CREATED_BY",updatable=false)
+	private String createdBy;
+
+	@Column(name = "UPDATED_DATE")
+	private Timestamp updatedDate;
+
+	@Column(name = "UPDATED_BY")
+	private String updatedBy;
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the zoneName
+	 */
+	public String getZoneName() {
+		return zoneName;
+	}
+
+	/**
+	 * @param zoneName the zoneName to set
+	 */
+	public void setZoneName(String zoneName) {
+		this.zoneName = zoneName;
+	}
+
+	/**
+	 * @return the locationId
+	 */
+	public Long getLocationId() {
+		return locationId;
+	}
+
+	/**
+	 * @param locationId the locationId to set
+	 */
+	public void setLocationId(Long locationId) {
+		this.locationId = locationId;
+	}
+
+	/**
+	 * @return the geofence
+	 */
+	public String getGeofence() {
+		return geofence;
+	}
+
+	/**
+	 * @param geofence the geofence to set
+	 */
+	public void setGeofence(String geofence) {
+		this.geofence = geofence;
+	}
+
+	/**
+	 * @return the lattitude
+	 */
+	public Double getLattitude() {
+		return lattitude;
+	}
+
+	/**
+	 * @param lattitude the lattitude to set
+	 */
+	public void setLattitude(Double lattitude) {
+		this.lattitude = lattitude;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	/**
+	 * @return the radius
+	 */
+	public Double getRadius() {
+		return radius;
+	}
+
+	/**
+	 * @param radius the radius to set
+	 */
+	public void setRadius(Double radius) {
+		this.radius = radius;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the subType
+	 */
+	public String getSubType() {
+		return subType;
+	}
+
+	/**
+	 * @param subType the subType to set
+	 */
+	public void setSubType(String subType) {
+		this.subType = subType;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	/**
+	 * @return the reason
+	 */
+	public String getReason() {
+		return reason;
+	}
+
+	/**
+	 * @param reason the reason to set
+	 */
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	/**
+	 * @return the createdDate
+	 */
+	public Timestamp getCreatedDate() {
+		return createdDate;
+	}
+
+	/**
+	 * @param createdDate the createdDate to set
+	 */
+	public void setCreatedDate(Timestamp createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	/**
+	 * @return the createdBy
+	 */
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	/**
+	 * @param createdBy the createdBy to set
+	 */
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	/**
+	 * @return the updatedDate
+	 */
+	public Timestamp getUpdatedDate() {
+		return updatedDate;
+	}
+
+	/**
+	 * @param updatedDate the updatedDate to set
+	 */
+	public void setUpdatedDate(Timestamp updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
+	/**
+	 * @return the updatedBy
+	 */
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	/**
+	 * @param updatedBy the updatedBy to set
+	 */
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+}

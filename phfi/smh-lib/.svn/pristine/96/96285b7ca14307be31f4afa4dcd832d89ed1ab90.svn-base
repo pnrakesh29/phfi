@@ -1,0 +1,73 @@
+package com.chatak.beacon.model;
+
+public class BeaconLocationMapRequest extends SearchRequest{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8455184241335528838L;
+	private Long beaconId;
+	private String locationId;
+	private String locName;
+	private String addr1;
+	private String addr2;
+	private String city;
+	private String state;
+	private String country;
+	private String zip;
+	
+	public Long getBeaconId() {
+		return beaconId;
+	}
+	public void setBeaconId(Long beaconId) {
+		this.beaconId = beaconId;
+	}
+	public String getLocationId() {
+		return locationId;
+	}
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+	public String getAddr1() {
+		return addr1;
+	}
+	public void setAddr1(String addr1) {
+		this.addr1 = addr1;
+	}
+	public String getAddr2() {
+		return addr2;
+	}
+	public void setAddr2(String addr2) {
+		this.addr2 = addr2;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getLocName() {
+		return locName;
+	}
+	public void setLocName(String locName) {
+		this.locName = locName;
+	}
+	public String getZip() {
+		return zip;
+	}
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
+}

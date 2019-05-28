@@ -1,0 +1,89 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.ZoneDao;
+import com.chatak.beacon.dao.model.QZone;
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.dao.repository.ZoneRepository;
+import com.chatak.beacon.model.ZoneManagementRequest;
+import com.chatak.beacon.util.StringUtil;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.expr.BooleanExpression;
+
+@Repository("zoneDao")
+public class ZoneDaoImpl implements ZoneDao {
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	
+	@Autowired
+	private ZoneRepository zoneRepository;
+	
+	@Override
+	public void createOrUpdate(Zone zone) {
+		zoneRepository.save(zone);
+	}
+	@Override
+	public List<Zone> findByZoneId(String zoneId) {	
+		return zoneRepository.findByZoneId(zoneId);
+	}
+	@Override
+	public List<Zone> searchZone(ZoneManagementRequest zoneRequest) {
+
+	    int startIndex = 0;
+	    int endIndex = 0;
+	    Integer totalRecords = zoneRequest.getNoOfRecords();
+
+	    if(zoneRequest.getPageIndex() == null || zoneRequest.getPageIndex() == 1) {
+	      totalRecords = getTotalNumberOfRecords(zoneRequest);
+	      zoneRequest.setNoOfRecords(totalRecords);
+	    }
+
+	    if(zoneRequest.getPageIndex() == null && zoneRequest.getPageSize() == null) {
+	      startIndex = 0;
+	      endIndex = Constant.DEFAULT_PAGE_SIZE;
+	    }
+	    else {
+	      startIndex = (zoneRequest.getPageIndex() - 1) * zoneRequest.getPageSize();
+	      endIndex = startIndex + zoneRequest.getPageSize();
+	    }
+	    JPAQuery query = new JPAQuery(entityManager);
+	    List<Zone> zones = query.from(QZone.zone).where(isZoneIdEq(zoneRequest.getZoneId()),
+	                                                                                                isStateEq(zoneRequest.getState()),
+	                                                                                                isCountryEq(zoneRequest.getCountry()),
+	                                                                                                isCityEq(zoneRequest.getCity())).offset(startIndex).limit(endIndex).orderBy(QZone.zone.id.desc()).list(QZone.zone);
+	    return zones;
+	  
+	}
+	 private int getTotalNumberOfRecords(ZoneManagementRequest zoneRequest) {
+    JPAQuery query = new JPAQuery(entityManager);
+    List<Long> list = query.from(QZone.zone).where(isZoneIdEq(zoneRequest.getZoneId()),
+															            isStateEq(zoneRequest.getState()),
+															            isCountryEq(zoneRequest.getCountry()),
+															            isCityEq(zoneRequest.getCity())).list(QZone.zone.id);
+    return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+  }
+	private BooleanExpression isZoneIdEq(String zoneId) {
+		    return (zoneId != null && !"".equals(zoneId)) ? QZone.zone.zoneId.toUpperCase().like("%"+ zoneId.toUpperCase().replace("*","")+ "%"): null;
+		  }
+	 private BooleanExpression isStateEq(String state) {
+		    return (state != null && !"".equals(state)) ? QZone.zone.zoneId.toUpperCase().like("%"+ state.toUpperCase().replace("*","")+ "%"): null;
+		  }
+	 private BooleanExpression isCountryEq(String country) {
+		    return (country != null && !"".equals(country)) ? QZone.zone.zoneId.toUpperCase().like("%"+ country.toUpperCase().replace("*","")+ "%"): null;
+		  }
+	 private BooleanExpression isCityEq(String city) {
+		    return (city != null && !"".equals(city)) ? QZone.zone.zoneId.toUpperCase().like("%"+ city.toUpperCase().replace("*","")+ "%"): null;
+		  }
+	
+
+}

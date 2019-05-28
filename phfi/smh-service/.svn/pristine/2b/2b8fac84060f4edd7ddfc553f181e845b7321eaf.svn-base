@@ -1,0 +1,41 @@
+package com.chatak.beacon.handler;
+
+import com.chatak.beacon.model.BeaconLocationRequest;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconResponse;
+import com.chatak.beacon.model.BeaconZoneMapRequest;
+import com.chatak.beacon.model.Response;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:45:23 AM
+ * @version 1.0
+ */
+public interface BeaconHandler {
+	
+	public Response createOrUpdateBeacon(BeaconRequest beaconRequest);
+	
+	public BeaconResponse findAllBeacons();
+	
+	public Response createBeaconLocation(BeaconLocationRequest locationRequest);
+	
+	public Response searchBeaconLocationMapRequest(BeaconLocationRequest searchRequest);
+	
+	/*public BeaconLocationRequest getBeaconLocationMapRequestDtls(BeaconLocationRequest searchRequest);*/
+	
+	public Response updateBeaconLocation(BeaconLocationRequest locationRequest);
+	
+	/*public Response beaconZoneMapRequest(BeaconZoneMapRequest mapRequest);*/
+	
+	public Response getBeaconsList();
+	
+	public Response getLocationsList();
+	
+	/*public Response getZonesList();*/
+	
+	public Response getBeaconZoneMapDisplayList(BeaconZoneMapRequest searchRequest);
+
+
+}

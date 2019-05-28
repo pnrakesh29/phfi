@@ -1,0 +1,285 @@
+package com.chatak.beacon.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Repository;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.dao.BeaconDao;
+import com.chatak.beacon.dao.model.Beacon;
+import com.chatak.beacon.dao.model.BeaconLocationMap;
+import com.chatak.beacon.dao.model.BeaconZoneMap;
+import com.chatak.beacon.dao.model.QBeacon;
+import com.chatak.beacon.dao.model.QBeaconLocationMap;
+import com.chatak.beacon.dao.model.QBeaconZoneMap;
+import com.chatak.beacon.dao.model.ZoneManagement;
+import com.chatak.beacon.dao.repository.BeaconLocationMapRepository;
+import com.chatak.beacon.dao.repository.BeaconRepository;
+import com.chatak.beacon.dao.repository.BeaconZoneMapRepository;
+import com.chatak.beacon.dao.repository.ZoneManagementRepository;
+import com.chatak.beacon.model.BeaconLocationMapRequest;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconZoneMapRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.ZoneManagementRequest;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.StringUtil;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.expr.BooleanExpression;
+import com.mysema.query.Tuple;
+
+/**
+*
+* << Add Comments Here >>
+*
+* @author Girmiti Software
+* @date 16-Nov-2015 1:20:11 PM
+* @version 1.0
+*/
+@Repository("beaconDao")
+public class BeaconDaoImpl implements BeaconDao{
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Autowired
+	private BeaconRepository beaconRepository;
+	
+	@Autowired
+	BeaconLocationMapRepository beaconLocationMapRepository;
+	
+	@Autowired
+	BeaconZoneMapRepository beaconZoneMapRepository;
+	
+	@Autowired
+	ZoneManagementRepository zoneManagementRepository;
+	
+	@Override
+	public Beacon createBeacon(Beacon beaconRequest) {
+		return beaconRepository.save(beaconRequest);
+	}
+	
+	@Override
+	public List<Beacon> findByBeaconId(String beaconId) {
+		return beaconRepository.findByBeaconId(beaconId.trim());
+	}
+	
+	@Override
+	public List<Beacon> findByBeaconName(String beaconName) {
+		return beaconRepository.findByBeaconName(beaconName.trim());
+	}
+	
+	@Override
+	public List<Beacon> getAllBeacons() {
+		return beaconRepository.findByStatus(Constant.ACTIVE);
+	}
+	
+	@Override
+	public BeaconLocationMap mapBeaconLocation(BeaconLocationMap mapRequest) {
+		return beaconLocationMapRepository.save(mapRequest);
+	}
+	
+	@Override
+	public BeaconZoneMap mapBeaconZone(BeaconZoneMap mapRequest) {
+		return beaconZoneMapRepository.save(mapRequest);
+	}
+				
+	@Override
+	public List<BeaconLocationMap> findByLocationBeaconId(Long  beaconid) {
+		return beaconLocationMapRepository.findByBeaconId(beaconid);
+	}
+	
+	@Override
+	public BeaconLocationMap findByLocationMapBeaconId(Long  beaconid,String locationId) {
+
+		return beaconLocationMapRepository.findByBeaconIdAndLocationId(beaconid,locationId.trim());
+			
+	}
+	
+	@Override
+	public BeaconZoneMap findByZoneBeaconId(Long  beaconid) {
+		return beaconZoneMapRepository.findByBeaconId(beaconid);
+	}
+	
+	@Override
+	public List<BeaconZoneMapRequest> getBeaconZoneMapList(BeaconZoneMapRequest searchRequest) {
+		List<BeaconZoneMapRequest> list = new ArrayList<BeaconZoneMapRequest>();
+		
+		int startIndex = 0;
+        int endIndex = 0;
+        Integer totalRecords = searchRequest.getNoOfRecords();
+        
+        /*try {
+        List<BeaconZoneMap> mapList = beaconZoneMapRepository.findAll();
+	      list = CommonUtil.copyListBeanProperty(mapList, BeaconZoneMapRequest.class);
+        }catch(Exception e) {
+	  	   e.printStackTrace();
+	  	    
+	  	   }*/
+        
+        if(searchRequest.getPageIndex() == null || searchRequest.getPageIndex() == 1){
+            totalRecords = getTotalNumberOfBeaconZoneMapRecords(searchRequest);
+            searchRequest.setNoOfRecords(totalRecords);
+        }
+        
+        if(searchRequest.getPageIndex() == null && searchRequest.getPageSize() == null){
+        	startIndex = 0;
+        	endIndex = Constant.DEFAULT_PAGE_SIZE;
+        } else {
+        	startIndex = (searchRequest.getPageIndex()-1) * searchRequest.getPageSize();
+            endIndex = startIndex + searchRequest.getPageSize();
+        }
+        
+        JPAQuery query = new JPAQuery(entityManager);
+        List<Tuple> tupleList = query.from(QBeaconZoneMap.beaconZoneMap)
+				.where(isBeaconIdEq(searchRequest.getBeaconId()),
+						isZoneIdEq(searchRequest.getZoneId())
+						)
+						.offset(startIndex)
+						             .limit(endIndex)
+						             .orderBy(QBeaconZoneMap.beaconZoneMap.beaconId.desc())
+						             .list
+						             (QBeaconZoneMap.beaconZoneMap.beaconId,QBeaconZoneMap.beaconZoneMap.zoneId);
+						            		
+        
+        for (Tuple tuple : tupleList) {
+        	BeaconZoneMapRequest beaconLocationMapRequest = new BeaconZoneMapRequest();
+        	beaconLocationMapRequest.setBeaconId(tuple.get(QBeaconZoneMap.beaconZoneMap.beaconId));
+        	beaconLocationMapRequest.setZoneId(tuple.get(QBeaconZoneMap.beaconZoneMap.zoneId));
+        	list.add(beaconLocationMapRequest);
+		}
+       
+        
+		
+		return list;
+	}
+		
+	
+	@Override
+	public List<BeaconLocationMapRequest> searchBeanconLocationMap(BeaconLocationMapRequest searchRequest) {
+			
+		List<BeaconLocationMapRequest> beaconLocationMapList = new ArrayList<BeaconLocationMapRequest>();
+		
+		int startIndex = 0;
+        int endIndex = 0;
+        Integer totalRecords = searchRequest.getNoOfRecords();
+        
+        if(searchRequest.getPageIndex() == null || searchRequest.getPageIndex() == 1){
+            totalRecords = getTotalNumberOfBeaconLocationMapRecords(searchRequest);
+            searchRequest.setNoOfRecords(totalRecords);
+        }
+        
+        if(searchRequest.getPageIndex() == null && searchRequest.getPageSize() == null){
+        	startIndex = 0;
+        	endIndex = Constant.DEFAULT_PAGE_SIZE;
+        } else {
+        	startIndex = (searchRequest.getPageIndex()-1) * searchRequest.getPageSize();
+            endIndex = startIndex + searchRequest.getPageSize();
+        }
+		
+        JPAQuery query = new JPAQuery(entityManager);
+        List<Tuple> tupleList = query.from(QBeaconLocationMap.beaconLocationMap,QBeacon.beacon)
+				.where(isBeaconIdEq(searchRequest.getBeaconId()),
+						isLocationIdEq(searchRequest.getLocationId()),
+						QBeaconLocationMap.beaconLocationMap.beaconId.eq(QBeacon.beacon.id))
+						.offset(startIndex)
+						             .limit(endIndex)
+						             .orderBy(QBeaconLocationMap.beaconLocationMap.locationId.desc())
+						             .list
+						             (QBeaconLocationMap.beaconLocationMap.locationId,QBeaconLocationMap.beaconLocationMap.locName,
+						            		 QBeacon.beacon.id,QBeacon.beacon.beaconName);
+        
+        for (Tuple tuple : tupleList) {
+        	BeaconLocationMapRequest beaconLocationMapRequest = new BeaconLocationMapRequest();
+        	beaconLocationMapRequest.setLocationId(tuple.get(QBeaconLocationMap.beaconLocationMap.locationId));
+        	beaconLocationMapRequest.setLocName(tuple.get(QBeaconLocationMap.beaconLocationMap.locName));
+         	beaconLocationMapRequest.setBeaconId(tuple.get(QBeacon.beacon.id));
+        	beaconLocationMapList.add(beaconLocationMapRequest);
+		}
+       
+        return beaconLocationMapList;
+	}
+	
+	@Override
+	  public List<BeaconRequest> findAllBeacons() throws DataAccessException {
+	    List<BeaconRequest> list = new ArrayList<BeaconRequest>();
+	    try {
+	      List<Beacon> beaconList = beaconRepository.findAll();
+	      list = CommonUtil.copyListBeanProperty(beaconList, BeaconRequest.class);
+	    }
+	    catch(Exception e) {
+	    e.printStackTrace();
+	    
+	    }
+
+	    return list;
+	  }
+	
+	@Override
+	  public List<LocationRequest> findAllLocations() throws DataAccessException {
+	    List<LocationRequest> list = new ArrayList<LocationRequest>();
+	    try {
+	      List<BeaconLocationMap> locationList = beaconLocationMapRepository.findAll();
+	      list = CommonUtil.copyListBeanProperty(locationList, LocationRequest.class);
+	    }
+	    catch(Exception e) {
+	    e.printStackTrace();
+	    
+	    }
+
+	    return list;
+	  }
+	
+	@Override
+	  public List<ZoneManagementRequest> findAllZones() throws DataAccessException {
+	    List<ZoneManagementRequest> list = new ArrayList<ZoneManagementRequest>();
+	    try {
+	      List<ZoneManagement> zoneList = zoneManagementRepository.findAll();
+	      list = CommonUtil.copyListBeanProperty(zoneList, ZoneManagementRequest.class);
+	    }
+	    catch(Exception e) {
+	    e.printStackTrace();
+	    
+	    }
+
+	    return list;
+	  }
+	
+	private int getTotalNumberOfBeaconLocationMapRecords(BeaconLocationMapRequest beaconLocationMapRequest){
+		JPAQuery query = new JPAQuery(entityManager);
+		List<String> list = query.from(QBeaconLocationMap.beaconLocationMap,QBeacon.beacon)
+						.where(isBeaconIdEq(beaconLocationMapRequest.getBeaconId()),
+								isLocationIdEq(beaconLocationMapRequest.getLocationId()),
+								QBeaconLocationMap.beaconLocationMap.beaconId.eq(QBeacon.beacon.id))
+					   .list(QBeaconLocationMap.beaconLocationMap.locationId);
+		return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+	}
+	
+	private int getTotalNumberOfBeaconZoneMapRecords(BeaconZoneMapRequest beaconZoneMapRequest){
+		JPAQuery query = new JPAQuery(entityManager);
+		List<Long> list = query.from(QBeaconZoneMap.beaconZoneMap)
+						.where(isBeaconIdEq(beaconZoneMapRequest.getBeaconId()),
+								isZoneIdEq(beaconZoneMapRequest.getZoneId())
+								)
+					   .list(QBeaconZoneMap.beaconZoneMap.beaconId);
+		return (StringUtil.isListNotNullNEmpty(list) ? list.size() : 0);
+	}
+	
+	private BooleanExpression isBeaconIdEq(Long beaconId){
+	    return (beaconId != null && !"".equals(beaconId)) ? QBeacon.beacon.id.like( "%" + beaconId.toString().replace("*", "") + "%") : null;
+	}
+	
+	private BooleanExpression isZoneIdEq(Long zoneId){
+	    return (zoneId != null && !"".equals(zoneId)) ? QBeacon.beacon.id.like( "%" + zoneId.toString().replace("*", "") + "%") : null;
+	}
+	
+	private BooleanExpression isLocationIdEq(String locationId){
+	    return (locationId != null && !"".equals(locationId)) ? QBeaconLocationMap.beaconLocationMap.locationId.toUpperCase().like( "%" + locationId.toUpperCase().replace("*", "") + "%") : null;
+	}
+}

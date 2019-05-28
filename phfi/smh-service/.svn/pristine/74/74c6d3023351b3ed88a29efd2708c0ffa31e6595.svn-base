@@ -1,0 +1,45 @@
+package com.chatak.beacon.util;
+
+
+
+import java.io.IOException;
+
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+
+
+/**
+ *
+ * Class to fetch the properties' values from property file
+ *
+ * @author Girmiti Software
+ * @date 20-Mar-2015 5:26:10 PM
+ * @version 1.0
+ */
+public final class Properties extends PropertyPlaceholderConfigurer {
+
+	// Property key for propsExported
+	private static java.util.Properties propsExported = new java.util.Properties();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.core.io.support.PropertiesLoaderSupport#mergeProperties
+	 * ()
+	 */
+	protected java.util.Properties mergeProperties() throws IOException {
+		propsExported = super.mergeProperties();
+		return propsExported;
+	}
+
+	/**
+	 * Get the value of given key from the property file
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static String getProperty(final String key) {
+		String value = propsExported.getProperty(key);
+		return ((value == null) ? "" : value);
+	}
+}

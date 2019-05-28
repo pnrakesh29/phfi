@@ -1,0 +1,66 @@
+package com.chatak.beacon.dao.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
+* << Add Comments Here >>
+* 
+* @author Girmiti Software
+* @date 16-Nov-2015 06:19:51 PM
+* @version 1.0
+*/
+@Entity
+@Table(name = "ZONE_BEACON_MAP")
+public class BeaconZoneMap implements Serializable {
+	
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2805494368933796427L;
+
+	@Id
+	  @SequenceGenerator(name = "SEQ_ZONE_BEACON_MAP_ID", sequenceName = "SEQ_ZONE_BEACON_MAP")
+	  @GeneratedValue(generator = "SEQ_ZONE_BEACON_MAP_ID")
+	
+	 @Column(name = "ID")
+	  private Long id;
+	  
+	  @Column(name = "BEACON_ID")
+	  private Long beaconId;
+
+	  @Column(name = "ZONE_ID")
+	  private Long zoneId;
+
+	public Long getBeaconId() {
+		return beaconId;
+	}
+
+	public void setBeaconId(Long beaconId) {
+		this.beaconId = beaconId;
+	}
+
+	public Long getZoneId() {
+		return zoneId;
+	}
+
+	public void setZoneId(Long zoneId) {
+		this.zoneId = zoneId;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+}

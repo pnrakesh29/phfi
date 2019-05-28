@@ -1,0 +1,47 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.AdminUser;
+import com.chatak.beacon.model.AdminUserRequest;
+
+/**
+ *
+ * << Add Comments Here >>
+ *
+ * @author Girmiti Software
+ * @date 27-Apr-2015 10:46:11 AM
+ * @version 1.0
+ */
+public interface AdminUserDao {
+
+  /**
+   * @param email
+   * @param spPass
+   * @return
+   * @throws DataAccessException
+   */
+  public boolean authenticateChatakAdmin(String email, String spPass) throws DataAccessException;
+
+  /**
+   * @param email
+   * @param spPass
+   * @return
+   * @throws DataAccessException
+   */
+  public AdminUser authenticateChatakAdminUser(String spUName) throws DataAccessException;
+  
+  public List<AdminUser> findByUserName(String userName) throws DataAccessException;
+  
+  public AdminUser saveOrUpdateAdminUser(AdminUser adminUserDetails)  throws DataAccessException;
+  
+  public AdminUser findByAdminUserId(Long adminUserId)throws DataAccessException;
+  
+  public List<AdminUser> findByUserEmailId(String email) throws DataAccessException;
+  
+  public List<AdminUser> findByAdminUserLoginNameOrEmail(String userName, String email) throws DataAccessException;
+
+  public List<AdminUserRequest> searchAdminUser(AdminUserRequest adminUserRequestTemp) throws DataAccessException, Exception;
+}

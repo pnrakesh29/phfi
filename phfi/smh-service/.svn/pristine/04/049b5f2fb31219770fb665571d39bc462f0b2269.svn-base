@@ -1,0 +1,76 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/aop	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+	<bean id="propertyConfigurers" class="com.chatak.beacon.util.Properties"></bean>
+	
+	<bean id="javaMailSender" class ="org.springframework.mail.javamail.JavaMailSenderImpl" >
+   		
+   		<property name="host" value="${mail.smtp.host}"></property>
+   		
+        <property name="port" value="${mail.smtp.port}"></property>
+        
+        <property name="protocol" value="${mail.smtp.protocol}"></property>
+        	
+        <property name="username" value="${chatak.email.username}"></property>
+        
+        <property name="password" value="${chatak.email.password}"></property>
+        
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+                <prop key="mail.smtp.ssl.trust">mail.gmail.com</prop>
+            </props>
+        </property>
+	</bean>
+	
+	<bean id="javSMSSender" class ="com.chatak.beacon.smssender.service.SMSProps" >
+   		
+   		<property name="smsGatewayServiceBaseUrl" value="${sms.gateway.base.url}"></property>
+   		
+   		<property name="smsGatewayServiceUserName" value="${sms.gateway.base.api.username}"></property>
+   		
+   		<property name="smsGatewayServicePassword" value="${sms.gateway.base.api.password}"></property>
+   		
+   		<property name="smsGatewayServiceSend" value="${sms.gateway.base.api.send}"></property>
+   		
+   		<property name="smsGatewayServicePriority" value="${sms.gateway.base.api.priority}"></property>
+   		
+   		<property name="smsGatewayServiceVP" value="${sms.gateway.base.api.vp}"></property>
+   		
+   		<property name="smsGatewaySenderConcat" value="${sms.gateway.base.api.concat}"></property>
+   		
+   		<property name="smsGatewayServiceConTimeout" value="${sms.gateway.base.req.timeout}"></property>
+         
+        <property name="smsGatewayServiceSoTimeout" value="${sms.gateway.base.soc.timeout}"></property>
+        
+   		<!-- <property name="smsGatewayServiceBaseUrl" value="${sms.gateway.base.url}"></property>
+   		
+        <property name="smsGatewayServiceApiKey" value="${sms.gateway.base.api.key}"></property>
+        
+        <property name="smsGatewayServiceApiSecret" value="${sms.gateway.base.api.secret}"></property>
+        	
+        <property name="smsGatewayServiceFrom" value="${sms.gateway.base.api.from}"></property>
+        
+        <property name="smsGatewaySenderId" value="${sms.gateway.base.api.sender.id}"></property>
+        
+         <property name="smsGatewayServiceConTimeout" value="${sms.gateway.base.req.timeout}"></property>
+         
+          <property name="smsGatewayServiceSoTimeout" value="${sms.gateway.base.soc.timeout}"></property> -->
+        
+	</bean>
+	
+	<bean id="forkAdvice" class="com.chatak.beacon.mailsender.service.impl.ForkAdvice" />
+
+	<aop:config>
+		<aop:aspect ref="forkAdvice">
+			<aop:around method="fork" pointcut="execution(* org.springframework.mail.javamail.JavaMailSenderImpl.send(..))" />
+		</aop:aspect>
+	</aop:config>
+
+</beans>

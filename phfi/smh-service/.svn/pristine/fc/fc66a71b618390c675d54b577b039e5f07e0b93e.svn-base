@@ -1,0 +1,49 @@
+package com.chatak.beacon.rest.service;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.chatak.beacon.model.ChangeStatusRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.LocationResponse;
+import com.chatak.beacon.model.Response;
+
+/**
+ * << Add Comments Here >>
+ * 
+ * @author Girmiti Software
+ * @date 19-Nov-2015 4:23:23 PM
+ * @version 1.0
+ */
+public interface RestLocationService {
+
+	public Response createLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			LocationRequest locationRequest);
+
+	public LocationResponse searchLocation(
+			HttpServletRequest request, HttpServletResponse response,
+			HttpSession session, LocationRequest locationRequest);
+
+	public Response updateLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			LocationRequest locationRequest);
+
+	public LocationResponse findLocationDetails(
+			HttpServletRequest request, HttpServletResponse response,
+			HttpSession session, Long id);
+
+	public Response deleteLocation(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, Long id);
+
+	public Response changeStatus(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			ChangeStatusRequest changeStatusRequest);
+	
+	public LocationResponse getAllActiveLocations(HttpServletRequest request, 
+			HttpServletResponse response, HttpSession session);
+	
+	public LocationResponse getAllLocations(HttpServletRequest request, 
+			HttpServletResponse response, HttpSession session);
+}

@@ -1,0 +1,29 @@
+package com.chatak.beacon.rest.service;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneManagementRequest;
+import com.chatak.beacon.model.ZoneManagementResponse;
+
+public interface RestZoneService {
+
+	public Response createOrUpdateZone(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			ZoneManagementRequest zoneManagementRequest);
+
+	public Response searchZone(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			ZoneManagementRequest zoneManagementRequest);
+
+	public ZoneManagementResponse findZoneDetails(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			ZoneManagementRequest zoneManagementRequest);
+
+	public Response deleteZone(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session,
+			ZoneManagementRequest zoneManagementRequest);
+
+}

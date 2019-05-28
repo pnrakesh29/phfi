@@ -1,0 +1,174 @@
+package com.chatak.beacon.handler.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.chatak.beacon.constants.Constant;
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.ZoneDao;
+import com.chatak.beacon.dao.model.Zone;
+import com.chatak.beacon.enums.Status;
+import com.chatak.beacon.handler.ZoneHandler;
+import com.chatak.beacon.model.Response;
+import com.chatak.beacon.model.ZoneManagementRequest;
+import com.chatak.beacon.model.ZoneManagementResponse;
+import com.chatak.beacon.util.CommonUtil;
+import com.chatak.beacon.util.Properties;
+import com.chatak.beacon.util.StringUtil;
+
+@Service("zoneHandler")
+public class ZoneHandlerImpl implements ZoneHandler{
+	
+	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	@Autowired
+	private ZoneDao zoneManagementDao;
+	
+	@Override
+	public Response createOrUpdateZone(ZoneManagementRequest zoneManagementRequest) {
+		 logger.info("Entering:: ZoneServiceHandlerImpl:: createOrUpdateZone method");
+		Response response = new Response();
+		try{
+			List<Zone> zoneManagement = zoneManagementDao.findByZoneId(zoneManagementRequest.getZoneId());
+			if(CommonUtil.isListNotNullAndEmpty(zoneManagement)){
+				Zone ZoneManagementUpdate = CommonUtil.copyBeanProperties(zoneManagement.get(0), Zone.class);
+				Zone zoneManagement1 =updateZoneDetails(ZoneManagementUpdate,zoneManagementRequest);
+				zoneManagementDao.createOrUpdate(zoneManagement1);
+				response.setResponseCode(ErrorCode.ZONE_UPDATED);
+		   	    response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_UPDATED));
+		   	    return response;
+			}
+			Zone createZoneManagement = createZoneData(zoneManagementRequest);
+			zoneManagementDao.createOrUpdate(createZoneManagement);
+			response.setResponseCode(ErrorCode.ZONE_CREATED);
+	   	    response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_CREATED));
+		}catch(DataAccessException e) {
+   	      logger.error("Error :: ZoneServiceHandlerImpl :: createOrUpdateZone method", e);
+   	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+   	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+   	    }
+   	    catch(Exception e) {
+   	      logger.error("Error :: ZoneServiceHandlerImpl :: createOrUpdateZone method", e);
+   	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+   	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+   	    }
+		return response;
+	}
+
+	private Zone createZoneData(ZoneManagementRequest zoneManagementRequest) {
+		Zone zoneManagement = new Zone();
+		zoneManagement.setZoneId(zoneManagementRequest.getZoneId());
+		zoneManagement.setAddress1(zoneManagementRequest.getAddress1());
+		zoneManagement.setAddress2(zoneManagementRequest.getAddress2());
+		zoneManagement.setCountry(zoneManagementRequest.getCountry());
+		zoneManagement.setCity(zoneManagementRequest.getCity());
+		zoneManagement.setState(zoneManagementRequest.getState());
+		zoneManagement.setZip(zoneManagementRequest.getZip());
+		zoneManagement.setStatus(Status.Active.toString());
+		return zoneManagement;
+	}
+	private Zone updateZoneDetails(Zone zoneManagementUpdate,ZoneManagementRequest zoneManagementRequest) {
+		Zone  zoneManagement = new Zone();
+		zoneManagement.setId(zoneManagementUpdate.getId());
+		zoneManagement.setZoneId(zoneManagementUpdate.getZoneId());
+		zoneManagement.setAddress1(zoneManagementRequest.getAddress1());
+		zoneManagement.setAddress2(zoneManagementRequest.getAddress2());
+		zoneManagement.setCountry(zoneManagementRequest.getCountry());
+		zoneManagement.setCity(zoneManagementRequest.getCity());
+		zoneManagement.setState(zoneManagementRequest.getState());
+		zoneManagement.setZip(zoneManagementRequest.getZip());
+		zoneManagement.setStatus(zoneManagementRequest.getStatus());
+		return zoneManagement;
+	}
+
+	@Override
+	public Response searchZone(ZoneManagementRequest zoneManagementRequest) {
+		 logger.info("Entering :: ZoneServiceHandlerImpl :: searchZone method");
+		 ZoneManagementResponse response = new ZoneManagementResponse();
+		    List<ZoneManagementRequest> zoneManagementRequests = new ArrayList<ZoneManagementRequest>();
+		    try {
+		      List<Zone> zoneManagement = zoneManagementDao.searchZone(zoneManagementRequest);
+		      if(StringUtil.isListNotNullNEmpty(zoneManagement)) {
+		    	  zoneManagementRequests = CommonUtil.copyListBeanProperty(zoneManagement, ZoneManagementRequest.class);
+		        response.setZoneManagementRequest(zoneManagementRequests);
+		      }
+		      response.setNoOfRecords(zoneManagementRequest.getNoOfRecords());
+		      response.setResponseCode(ErrorCode.ERROR_CODE_00);
+		      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+		    }
+		    catch(Exception e) {
+		      logger.error("Error :: ZoneServiceHandlerImpl :: searchZone method", e);
+		      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+		      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+		    }
+		    logger.info("Exiting :: ZoneServiceHandlerImpl :: searchZone method");
+
+		    return response;
+	}
+
+	@Override
+	public ZoneManagementResponse findZoneDetails(ZoneManagementRequest zoneManagementRequest) {
+	    logger.info("Entering :: ServiceProviderServiceImpl :: findServiceProviderById method");
+	    ZoneManagementResponse response = new ZoneManagementResponse();
+	    List<ZoneManagementRequest> responseList = new ArrayList<ZoneManagementRequest>();
+	    try {
+	    	List<Zone> zoneManagement = zoneManagementDao.findByZoneId(zoneManagementRequest.getZoneId());
+	      if(!StringUtil.isListNotNullNEmpty(zoneManagement)) {
+	        response.setResponseCode(ErrorCode.ZONE_NOT_FOUND);
+	        response.setResponseMessage(Properties.getProperty(ErrorCode.ZONE_NOT_FOUND));
+	        return response;
+	      }
+	      ZoneManagementRequest zoneManagementData = CommonUtil.copyBeanProperties(zoneManagement.get(0),ZoneManagementRequest.class);
+	      responseList.add(zoneManagementData);
+	      response.setZoneManagementRequest(responseList);
+	      response.setResponseCode(ErrorCode.ERROR_CODE_00);
+	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: ServiceProviderServiceImpl :: findServiceProviderById method", e);
+	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	    }
+	    logger.info("Exiting :: ServiceProviderServiceImpl :: findServiceProviderById method");
+
+	    return response;
+	  }
+
+	@Override
+	public Response deleteZone(ZoneManagementRequest zoneManagementRequest) {
+	    logger.info("Entering :: ServiceProviderServiceImpl :: deleteServiceProvider method");
+	    ZoneManagementResponse response = new ZoneManagementResponse();
+	    try {
+	    	List<Zone> zoneManagement = zoneManagementDao.findByZoneId(zoneManagementRequest.getZoneId());
+	    	Zone zoneManagementUpdate = zoneManagement.get(0);
+	    	Zone zoneManagementBean = CommonUtil.copyBeanProperties(zoneManagementUpdate,Zone.class);
+	      if(Constant.ACTIVE.equals(zoneManagementBean.getStatus())) {
+	    	  zoneManagementBean.setStatus(Constant.DELETED);
+	    	  zoneManagementDao.createOrUpdate(zoneManagementBean);
+	        response.setResponseCode(ErrorCode.ERROR_CODE_00);
+	        response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_00));
+	        return response;
+	      }else {
+	        response.setResponseCode(ErrorCode.STATUS_NOT_ACTIVE);
+	        response.setResponseMessage(Properties.getProperty(ErrorCode.STATUS_NOT_ACTIVE));
+	        return response;
+	      }
+	    }
+	    catch(Exception e) {
+	      logger.error("Error :: ServiceProviderServiceImpl :: deleteServiceProvider method", e);
+	      response.setResponseCode(ErrorCode.ERROR_CODE_99);
+	      response.setResponseMessage(ErrorCode.getInstance().getMessage(ErrorCode.ERROR_CODE_99));
+	    }
+	    logger.info("Exiting :: ServiceProviderServiceImpl :: deleteServiceProvider method");
+	    return response;
+	  }
+	
+	
+
+}

@@ -1,0 +1,16 @@
+package com.chatak.beacon.dao.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+
+import com.chatak.beacon.dao.model.FloorPlan;
+
+public interface FloorPlanRepository extends JpaRepository<FloorPlan, Long>, QueryDslPredicateExecutor<FloorPlan> {
+	
+	public FloorPlan findById(Long id);
+	
+	public List<FloorPlan> findByFloorPlanName(String floorName);
+
+}

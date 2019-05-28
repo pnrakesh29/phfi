@@ -1,0 +1,39 @@
+package com.chatak.beacon.dao.model;
+
+import static com.mysema.query.types.PathMetadataFactory.*;
+
+import com.mysema.query.types.path.*;
+
+import com.mysema.query.types.PathMetadata;
+import javax.annotation.Generated;
+import com.mysema.query.types.Path;
+
+
+/**
+ * QBeaconZoneMap is a Querydsl query type for BeaconZoneMap
+ */
+@Generated("com.mysema.query.codegen.EntitySerializer")
+public class QBeaconZoneMap extends EntityPathBase<BeaconZoneMap> {
+
+    private static final long serialVersionUID = 2012795456L;
+
+    public static final QBeaconZoneMap beaconZoneMap = new QBeaconZoneMap("beaconZoneMap");
+
+    public final StringPath beaconId = createString("beaconId");
+
+    public final StringPath zoneId = createString("zoneId");
+
+    public QBeaconZoneMap(String variable) {
+        super(BeaconZoneMap.class, forVariable(variable));
+    }
+
+    public QBeaconZoneMap(Path<? extends BeaconZoneMap> path) {
+        super(path.getType(), path.getMetadata());
+    }
+
+    public QBeaconZoneMap(PathMetadata<?> metadata) {
+        super(BeaconZoneMap.class, metadata);
+    }
+
+}
+

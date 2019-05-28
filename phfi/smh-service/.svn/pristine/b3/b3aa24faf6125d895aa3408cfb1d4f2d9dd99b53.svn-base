@@ -1,0 +1,307 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+import com.chatak.beacon.constants.ErrorCode;
+import com.chatak.beacon.dao.model.AdminUser;
+import com.chatak.beacon.enums.Status;
+import com.chatak.beacon.exception.BeaconServiceException;
+import com.chatak.beacon.util.StringUtil;
+
+
+
+
+
+
+
+/**
+ * Base DAO for Database connection using Spring JDBC DAO component
+ * 
+ * @author Girmiti Software
+ * @date 16-Jul-2014 12:18:49 PM
+ * @version 1.0
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class BaseDao extends JdbcDaoSupport {
+
+	 Logger logger = LogManager.getLogger(this.getClass());
+
+  @Autowired
+  private DataSource dataSource;
+
+
+  @PostConstruct
+  void init() {
+    setDataSource(dataSource);
+  }
+
+  /**
+   * Method used to fetch active service provider
+   * 
+   * @param serviceProvider
+   * @return
+   * @throws BeaconServiceException
+   */
+  public List<ServiceProvider> getActiveServiceProvider(ServiceProvider serviceProvider) throws BeaconServiceException {
+    logger.info("prepaidservice :: BaseDao :: getActiveServiceProvider Entering");
+    List<ServiceProvider> serviceProviderList = null;
+
+    try {
+      StringBuilder sql = new StringBuilder("SELECT SERVICE_PROVIDER_ID, NAME, SERVICE_TYPE, SERVICE_SP_ID, SERVICE_TSM_ID, STATUS, DOMAIN, "
+                                            + " DESCRIPTION FROM PREPAID_SERVICE_PROVIDER WHERE SERVICE_PROVIDER_ID=? AND (STATUS = ? OR STATUS = ? OR STATUS = ? )");
+
+      serviceProviderList = getJdbcTemplate().query(sql.toString(),
+                                                    new Object[] { serviceProvider.getSERVICE_PROVIDER_ID(),
+                                                                  Status.Active.name(),
+                                                                  Status.PendingSuspend.name(),
+                                                                  Status.PendingUpdate.name() },
+                                                    new BeanPropertyRowMapper(ServiceProvider.class));
+    }
+    catch(DataAccessException e) {
+      logger.error("prepaidservice :: BaseDao :: getActiveServiceProvider :: DataAccessException ", e);
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+    catch(Exception e) {
+      logger.error("prepaidservice :: BaseDao :: getActiveServiceProvider :: Exception " + e.getMessage());
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+
+    logger.info("prepaidservice :: BaseDao :: getActiveServiceProvider Exiting");
+    return (StringUtil.isListNotNullNEmpty(serviceProviderList)) ? serviceProviderList : null;
+  }
+
+  /**
+   * Method used to fetch active service provider
+   * 
+   * @param serviceProvider
+   * @return
+   * @throws BeaconServiceException
+   */
+  public ServiceProvider getServiceProviderOnSPId(ServiceProvider serviceProvider) throws BeaconServiceException {
+    logger.info("prepaidservice :: BaseDao :: getServiceProvider Entering");
+    List<ServiceProvider> serviceProviderList = null;
+
+    try {
+      StringBuilder sql = new StringBuilder("SELECT SERVICE_PROVIDER_ID, NAME, SERVICE_TYPE, SERVICE_SP_ID, SERVICE_TSM_ID, STATUS, DOMAIN, "
+                                            + " DESCRIPTION, REASON FROM PREPAID_SERVICE_PROVIDER WHERE SERVICE_PROVIDER_ID=?");
+
+      serviceProviderList = getJdbcTemplate().query(sql.toString(),
+                                                    new Object[] { serviceProvider.getSERVICE_PROVIDER_ID() },
+                                                    new BeanPropertyRowMapper(ServiceProvider.class));
+    }
+    catch(DataAccessException e) {
+      logger.error("prepaidservice :: BaseDao :: getServiceProvider :: DataAccessException ", e);
+    }
+    catch(Exception e) {
+      logger.error("prepaidservice :: BaseDao :: getServiceProvider :: Exception " + e.getMessage());
+      	 throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+
+    logger.info("prepaidservice :: BaseDao :: getServiceProvider Exiting");
+    return (StringUtil.isListNotNullNEmpty(serviceProviderList)) ? serviceProviderList.get(0) : null;
+  }
+
+  /**
+   * Method used to fetch active sub service provider
+   * 
+   * @param serviceProvider
+   * @return
+   * @throws BeaconServiceException
+   */
+  public List<ServiceProvider> getActiveSubServiceProvider(ServiceProvider serviceProvider) throws BeaconServiceException {
+    logger.info("prepaidservice :: BaseDao :: getActiveServiceProvider Entering");
+    List<ServiceProvider> serviceProviderList = null;
+
+    try {
+      StringBuilder sql = new StringBuilder("SELECT SP.SERVICE_PROVIDER_ID FROM PREPAID_SERVICE_PROVIDER SP, "
+                                            + "PREPAID_SUBSERVICE_PROVIDER SSP WHERE SP.SERVICE_PROVIDER_ID=SSP.SERVICE_PROVIDER_ID "
+                                            + "AND SP.SERVICE_PROVIDER_ID=? AND SSP.SUBSERVICE_PROVIDER_ID=? "
+                                            + "AND SP.STATUS = 'Active' AND SSP.STATUS = 'Active'");
+
+      serviceProviderList = getJdbcTemplate().query(sql.toString(),
+                                                    new Object[] { serviceProvider.getSERVICE_PROVIDER_ID(),
+                                                                  serviceProvider.getSUBSERVICE_PROVIDER_ID() },
+                                                    new BeanPropertyRowMapper(ServiceProvider.class));
+    }
+    catch(DataAccessException e) {
+      logger.error("prepaidservice :: BaseDao :: getActiveServiceProvider :: DataAccessException ", e);
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+    catch(Exception e) {
+      logger.error("prepaidservice :: BaseDao :: getActiveServiceProvider :: Exception " + e.getMessage());
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+
+    logger.info("prepaidservice :: BaseDao :: getActiveServiceProvider Exiting");
+    return (StringUtil.isListNotNullNEmpty(serviceProviderList)) ? serviceProviderList : null;
+  }
+
+  /**
+   * Method used to fetch active sub service provider
+   * 
+   * @param serviceProvider
+   * @return
+   * @throws BeaconServiceException
+   */
+  public ServiceProvider getSubServiceProviderOnSSPId(ServiceProvider serviceProvider) throws BeaconServiceException {
+    logger.info("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId Entering");
+    List<ServiceProvider> serviceProviderList = null;
+
+    try {
+      StringBuilder sql = new StringBuilder("SELECT SP.SERVICE_PROVIDER_ID FROM PREPAID_SERVICE_PROVIDER SP, "
+                                            + "PREPAID_SUBSERVICE_PROVIDER SSP WHERE SP.SERVICE_PROVIDER_ID=SSP.SERVICE_PROVIDER_ID "
+                                            + "AND SP.SERVICE_PROVIDER_ID=? AND SSP.SUBSERVICE_PROVIDER_ID=? "
+                                            + "AND SP.STATUS = 'Active' AND SSP.STATUS = 'Active'");
+
+      serviceProviderList = getJdbcTemplate().query(sql.toString(),
+                                                    new Object[] { serviceProvider.getSERVICE_PROVIDER_ID(),
+                                                                  serviceProvider.getSUBSERVICE_PROVIDER_ID() },
+                                                    new BeanPropertyRowMapper(ServiceProvider.class));
+    }
+    catch(DataAccessException e) {
+      logger.error("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId :: DataAccessException ", e);
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+    catch(Exception e) {
+      logger.error("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId :: Exception " + e.getMessage());
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+
+    logger.info("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId Exiting");
+    return (StringUtil.isListNotNullNEmpty(serviceProviderList)) ? serviceProviderList.get(0) : null;
+  }
+
+  /**
+   * Method used to fetch active sub service provider
+   * 
+   * @param serviceProvider
+   * @return
+   * @throws BeaconServiceException
+   */
+  public ServiceProvider getSubServiceProviderOnSSPId(Long sspId) throws BeaconServiceException {
+    logger.info("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId Entering");
+    List<ServiceProvider> serviceProviderList = null;
+
+    try {
+      String sql = "SELECT SSP.SERVICE_PROVIDER_ID AS SERVICE_PROVIDER_ID, SSP.STATUS, SSP.SUBSERVICE_PROVIDER_ID AS SUBSERVICE_PROVIDER_ID,"
+                   + "SSP.NAME, SSP.SERVICE_TYPE, SSP.SERVICE_SP_ID, SSP.SERVICE_TSM_ID, SSP.STATUS, SSP.DOMAIN, SSP.DESCRIPTION,SSP.REASON FROM PREPAID_SERVICE_PROVIDER SP, "
+                   + "PREPAID_SUBSERVICE_PROVIDER SSP WHERE SP.SERVICE_PROVIDER_ID=SSP.SERVICE_PROVIDER_ID "
+                   + "AND SSP.SUBSERVICE_PROVIDER_ID=? ";
+
+      serviceProviderList = getJdbcTemplate().query(sql.toString(),
+                                                    new Object[] { sspId },
+                                                    new BeanPropertyRowMapper(ServiceProvider.class));
+    }
+    catch(DataAccessException e) {
+      logger.error("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId :: DataAccessException ", e);
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+      
+    }
+    catch(Exception e) {
+      logger.error("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId :: Exception " + e.getMessage());
+      throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+
+    logger.info("prepaidservice :: BaseDao :: getSubServiceProviderOnSSPId Exiting");
+    return (StringUtil.isListNotNullNEmpty(serviceProviderList)) ? serviceProviderList.get(0) : null;
+  }
+
+  /**
+   * Method to check the given service provider id is Active
+   * 
+   * @param serviceProviderId
+   * @throws BeaconServiceException
+   */
+  public void isActiveServiceProvider(Long serviceProviderId) throws BeaconServiceException {
+    ServiceProvider serviceProvider = new ServiceProvider();
+    serviceProvider.setSERVICE_PROVIDER_ID(serviceProviderId);
+    List<ServiceProvider> serviceProviders = getActiveServiceProvider(serviceProvider);
+    if(StringUtil.isListNullNEmpty(serviceProviders)) {
+    	throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+  }
+
+  /**
+   * Method to check the given service provider id and sub service provider is
+   * Active
+   * 
+   * @param serviceProviderId
+   * @param subServiceProviderId
+   * @throws BeaconServiceException
+   */
+  public void isActiveSubServiceProvider(Long serviceProviderId, Long subServiceProviderId) throws BeaconServiceException {
+    ServiceProvider serviceProvider = new ServiceProvider();
+    serviceProvider.setSERVICE_PROVIDER_ID(serviceProviderId);
+    List<ServiceProvider> serviceProviders = null;
+    if(null == subServiceProviderId || 0l == subServiceProviderId.longValue()) {
+      serviceProviders = getActiveServiceProvider(serviceProvider);
+    }
+    else {
+      serviceProvider.setSUBSERVICE_PROVIDER_ID(subServiceProviderId);
+      serviceProviders = getActiveSubServiceProvider(serviceProvider);
+    }
+    if(StringUtil.isListNullNEmpty(serviceProviders)) {
+    	throw new BeaconServiceException(ErrorCode.ERROR_CODE_99);
+    }
+  }
+
+  /**
+   * Method to check User is Active
+   * 
+   * @param userId
+   * @return
+   */
+  public boolean isUserActive(String userId) {
+    String sql = "select STATUS from PREPAID_USER WHERE USER_ID=?";
+    List<Map<String, Object>> userStatus = getJdbcTemplate().queryForList(sql, new Object[] { userId });
+    return (StringUtil.isListNotNullNEmpty(userStatus)) ? ((String) userStatus.get(0).get("STATUS")).equals(Status.Active.name())
+                                                       : false;
+  }
+
+  /**
+   * Method to get active Admin User on user id
+   * 
+   * @param userId
+   * @return
+   * @throws BeaconServiceException
+   */
+  public AdminUser getAdminUserOnUserId(String userId) {
+    String sql = "select * from ADMIN_USER WHERE ADMIN_USER_ID=?";
+    List<AdminUser> adminUsers = getJdbcTemplate().query(sql,
+                                                         new Object[] { userId },
+                                                         new BeanPropertyRowMapper(AdminUser.class));
+
+    return (StringUtil.isListNotNullNEmpty(adminUsers)) ? adminUsers.get(0) : null;
+  }
+
+  
+  
+  /**
+ * @param userId
+ * @return
+ */
+public AdminUser getActiveAdminUserAndRole(Long userId) {
+	    String sql = "select AU.ADMIN_USER_ID, AU.USER_ROLE_ID,PARTNER_ID,EMAIL,PASSWORD,USER_TYPE,FIRST_NAME,LAST_NAME, LANGUAGE,PHONE,LAST_LOGIN,PREVIOUS_PASSWORDS,TIME_ZONE,"
+	                 + "LAST_PASSWORD_CHANGE,PASS_RETRY_COUNT,AU.STATUS, UR.MAKER_CHECKER_REQ "
+	                 + " FROM ADMIN_USER AU, USER_ROLE UR WHERE AU.ADMIN_USER_ID=? "
+	                 + " AND AU.USER_ROLE_ID=UR.USER_ROLE_ID AND (AU.STATUS ='Active' OR AU.STATUS ='PendingSuspend' OR AU.STATUS ='PendingTerminate'  OR AU.STATUS ='PendingUpdate') "
+	                 + " AND (UR.STATUS = 'Active'  OR UR.STATUS ='PendingSuspend' OR UR.STATUS ='PendingTerminate' OR UR.STATUS ='PendingUpdate')";
+	    List<AdminUser> adminUsers = getJdbcTemplate().query(sql,
+	                                                         new Object[] { userId },
+	                                                         new BeanPropertyRowMapper(AdminUser.class));
+	    return (StringUtil.isListNotNullNEmpty(adminUsers)) ? adminUsers.get(0) : null;
+	  }
+	  
+
+}

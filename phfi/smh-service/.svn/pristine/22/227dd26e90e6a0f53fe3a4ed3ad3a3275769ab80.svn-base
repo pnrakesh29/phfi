@@ -1,0 +1,55 @@
+package com.chatak.beacon.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.chatak.beacon.dao.model.Beacon;
+import com.chatak.beacon.dao.model.BeaconLocationMap;
+import com.chatak.beacon.dao.model.BeaconZoneMap;
+import com.chatak.beacon.model.BeaconLocationMapRequest;
+import com.chatak.beacon.model.BeaconRequest;
+import com.chatak.beacon.model.BeaconZoneMapRequest;
+import com.chatak.beacon.model.LocationRequest;
+import com.chatak.beacon.model.ZoneManagementRequest;
+
+
+/**
+ *
+ * << Add Comments Here >>
+ *
+ * @author Girmiti Software
+ * @date 16-Nov-2015 1:05:11 PM
+ * @version 1.0
+ */
+public interface BeaconDao {
+	
+	public Beacon createBeacon(Beacon beaconRequest);
+	
+	public List<Beacon> findByBeaconId(String beaconid);
+	
+	public List<Beacon> findByBeaconName(String beaconName);
+	
+	public List<BeaconLocationMapRequest> searchBeanconLocationMap(BeaconLocationMapRequest searchrequest);
+			
+	public List<BeaconLocationMap> findByLocationBeaconId(Long beeaconId);
+	
+	public BeaconLocationMap findByLocationMapBeaconId(Long beeaconId,String locationId);
+		
+	public java.util.List<Beacon> getAllBeacons();
+	
+	public BeaconLocationMap mapBeaconLocation(BeaconLocationMap beaconMapRequest);
+	
+	public BeaconZoneMap mapBeaconZone(BeaconZoneMap beaconMapRequest);
+	
+	public List<BeaconRequest> findAllBeacons();
+	
+	public List<ZoneManagementRequest> findAllZones();
+	
+	public List<LocationRequest> findAllLocations();
+	
+	public BeaconZoneMap findByZoneBeaconId(Long beaconid);
+	
+	public List<BeaconZoneMapRequest> getBeaconZoneMapList(BeaconZoneMapRequest searchRequest);
+	
+}

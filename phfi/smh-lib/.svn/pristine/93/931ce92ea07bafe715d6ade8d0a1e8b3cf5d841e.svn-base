@@ -1,0 +1,39 @@
+package com.chatak.beacon.model;
+
+/**
+ * This class represents the Country request
+ * 
+ * @author Girmiti Software
+ * @date 16-Nov-2015 11:59:00 AM
+ * @version 1.0
+ */
+public class LocationRequest extends SearchRequest {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3742219028844191383L;
+
+	private String locationId;
+
+	private String name;
+
+	public String getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+
+}
